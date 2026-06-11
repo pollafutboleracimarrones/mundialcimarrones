@@ -104,7 +104,9 @@
   .pred-team-name { font-size: 12px; font-weight: 600; margin-top: 4px; }
   .pred-vs { font-size: 12px; color: var(--muted); text-align: center; }
   .pred-inputs { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
-  .pred-input { width: 52px; text-align: center; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 6px; font-size: 18px; font-weight: 800; outline: none; }
+  .pred-input { width: 52px; text-align: center; background: #fff; border: 2px solid #ddd; color: #111; padding: 8px; border-radius: 6px; font-size: 18px; font-weight: 800; outline: none; -moz-appearance: textfield; appearance: textfield; }
+  .pred-input::-webkit-outer-spin-button,
+  .pred-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .pred-input:focus { border-color: var(--accent); }
   .pred-dash { font-size: 18px; color: var(--muted); }
   .pred-result { display: flex; align-items: center; gap: 6px; font-size: 13px; }
@@ -164,16 +166,19 @@
     /* Main padding bottom para nav fija */
     .main { padding: 12px 10px 80px; }
 
-    /* Tabla posiciones simplificada */
+    /* Tabla posiciones - mostrar todas las columnas compactas */
     .standings-table th:nth-child(5),
     .standings-table td:nth-child(5),
     .standings-table th:nth-child(6),
-    .standings-table td:nth-child(6) { display: none; }
-    .standings-table th { padding: 8px; font-size: 10px; }
-    .standings-table td { padding: 10px 8px; font-size: 13px; }
-    .pts-cell { font-size: 16px; }
-    .player-name { font-size: 13px; }
-    .rank { font-size: 15px; }
+    .standings-table td:nth-child(6) { display: table-cell; }
+    .standings-table th { padding: 6px 4px; font-size: 9px; }
+    .standings-table td { padding: 8px 4px; font-size: 12px; }
+    .standings-table { font-size: 11px; }
+    .pts-cell { font-size: 14px; }
+    .player-name { font-size: 12px; }
+    .rank { font-size: 13px; width: 24px; }
+    .pts-detail { font-size: 10px; }
+    .progress-bar { display: none; }
 
     /* Filtros partidos */
     .match-filters { gap: 5px; }
@@ -187,16 +192,15 @@
     .flag { font-size: 22px; }
     .score-box { width: 42px; height: 36px; font-size: 18px; }
 
-    /* Predicciones - sidebar como scroll horizontal */
+    /* Predicciones - todo en columna, sin scroll horizontal */
     .pred-layout { grid-template-columns: 1fr; gap: 12px; }
-    .player-list { flex-direction: row; overflow-x: auto; padding-bottom: 6px; gap: 8px; }
-    .player-card { min-width: 130px; padding: 10px 12px; }
-    .player-card-name { font-size: 13px; }
-    .player-card-stats { font-size: 11px; }
-    .pred-match-card { padding: 12px; }
-    .pred-team-flag { font-size: 24px; }
-    .pred-team-name { font-size: 11px; }
-    .pred-input { width: 48px; font-size: 16px; padding: 6px; }
+    .player-sidebar { width: 100%; }
+    .player-list { flex-direction: row; overflow-x: auto; padding-bottom: 8px; gap: 8px; -webkit-overflow-scrolling: touch; }
+    .player-card { min-width: 120px; max-width: 140px; padding: 10px 12px; flex-shrink: 0; }
+    .player-card-name { font-size: 12px; }
+    .player-card-stats { font-size: 10px; }
+    .pred-match-card { padding: 12px 10px; }
+    .pred-input { width: 52px; font-size: 18px; padding: 8px; }
 
     /* Admin */
     .result-match-card { flex-direction: column; align-items: flex-start; gap: 8px; }
@@ -684,7 +688,7 @@ function renderPredictions() {
     }
 
     const disabledAttr = isMatchLocked ? 'disabled' : '';
-    const inputStyle = isMatchLocked ? 'style="cursor:not-allowed;background:#fff;color:#111;font-weight:800;border:2px solid var(--green);opacity:1;"' : '';
+    const inputStyle = isMatchLocked ? 'style="cursor:not-allowed;background:#fff;color:#111;font-weight:800;border:2px solid var(--green);"' : '';
 
     return `<div class="pred-match-card" style="${isMatchLocked ? 'border-left:3px solid var(--green);' : ''}">
       <div class="pred-match-header">
@@ -694,32 +698,25 @@ function renderPredictions() {
           ${ptsHtml}
         </div>
       </div>
-      <div class="pred-teams">
-        <div class="pred-team">
-          <div class="pred-team-flag">${flagH}</div>
-          <div class="pred-team-name">${m.home}</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:24px;">${flagH}</span>
+          <span style="font-size:15px;font-weight:600;flex:1;">${m.home}</span>
+          <input class="pred-input" type="number" min="0" max="20" value="${pred.home??''}" placeholder="-"
+            ${disabledAttr} ${inputStyle}
+            ${isMatchLocked ? '' : `oninput="savePred('${player}',${m.id},'home',this.value)"`} />
         </div>
-        <div>
-          <div class="pred-inputs">
-            <input class="pred-input" type="number" min="0" max="20" value="${pred.home??''}" placeholder="-"
-              ${disabledAttr} ${inputStyle}
-              ${isMatchLocked ? '' : `oninput="savePred('${player}',${m.id},'home',this.value)"`} />
-            <span class="pred-dash">-</span>
-            <input class="pred-input" type="number" min="0" max="20" value="${pred.away??''}" placeholder="-"
-              ${disabledAttr} ${inputStyle}
-              ${isMatchLocked ? '' : `oninput="savePred('${player}',${m.id},'away',this.value)"`} />
-          </div>
-          ${result ? `<div style="text-align:center;font-size:11px;color:var(--muted);margin-top:4px;">Real: ${result.home}-${result.away}</div>` : ''}
-          ${!isMatchLocked && hasBothValues
-            ? `<div style="text-align:center;margin-top:8px;">
-                <button class="btn btn-primary" style="font-size:12px;padding:5px 12px;" onclick="lockMatch('${player}',${m.id})">🔒 Guardar</button>
-               </div>`
-            : ''}
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:24px;">${flagA}</span>
+          <span style="font-size:15px;font-weight:600;flex:1;">${m.away}</span>
+          <input class="pred-input" type="number" min="0" max="20" value="${pred.away??''}" placeholder="-"
+            ${disabledAttr} ${inputStyle}
+            ${isMatchLocked ? '' : `oninput="savePred('${player}',${m.id},'away',this.value)"`} />
         </div>
-        <div class="pred-team">
-          <div class="pred-team-flag">${flagA}</div>
-          <div class="pred-team-name">${m.away}</div>
-        </div>
+        ${result ? `<div style="font-size:11px;color:var(--muted);text-align:right;">Resultado real: ${result.home}-${result.away}</div>` : ''}
+        ${!isMatchLocked && hasBothValues
+          ? `<button class="btn btn-primary" style="width:100%;margin-top:4px;" onclick="lockMatch('${player}',${m.id})">🔒 Guardar pronóstico</button>`
+          : ''}
       </div>
     </div>`;
   }).join('');
