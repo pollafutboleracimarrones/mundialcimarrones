@@ -261,6 +261,9 @@
       </thead>
       <tbody id="standings-rows"></tbody>
     </table>
+
+    <!-- ÚLTIMOS PARTIDOS -->
+    <div id="last-matches-section" style="margin-top:24px;"></div>
   </div>
 
   <!-- PARTIDOS -->
@@ -530,8 +533,69 @@ function showTab(tab) {
 }
 
 // ========================
-// STANDINGS
+// INITIALS MAP
 // ========================
+const INITIALS = {
+  'Sr. Godoy':     'GDY',
+  'Mauricio Diaz': 'MDZ',
+  'Don Timba':     'DTB',
+  'Nono':          'NON',
+  'Andres Reina':  'ARE',
+  'John Triviño':  'JTV',
+  'Carlos Toro':   'CTO',
+  'DJ Asesor':     'DJA'
+};
+
+function renderLastMatches() {
+  const container = document.getElementById('last-matches-section');
+  // Get finished matches sorted by id descending (most recent first)
+  const finished = MATCHES_DATA.filter(m => state.results[m.id])
+    .sort((a, b) => b.id - a.id)
+    .slice(0, 6); // show last 6 matches
+
+  if (!finished.length) {
+    container.innerHTML = '';
+    return;
+  }
+
+  container.innerHTML = `
+    <div style="font-size:13px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">⚽ Últimos Resultados</div>
+    ${finished.map(m => {
+      const r = state.results[m.id];
+      const flagH = FLAGS[m.home] || '🏳️';
+      const flagA = FLAGS[m.away] || '🏳️';
+
+      const playerResults = PLAYERS.map(p => {
+        const pred = (state.predictions[p] || {})[m.id];
+        const pts = calcPoints(pred, r);
+        const ini = INITIALS[p] || p.substring(0,3).toUpperCase();
+        let bg, icon, color;
+        if (pts === 2)      { bg = 'var(--green)';   icon = '✓✓'; color = '#000'; }
+        else if (pts === 1) { bg = 'var(--blue)';    icon = '✓';  color = '#fff'; }
+        else if (pts === 0) { bg = '#ef4444';         icon = '✗';  color = '#fff'; }
+        else                { bg = 'var(--surface2)'; icon = '–';  color = 'var(--muted)'; }
+        return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+          <div style="background:${bg};color:${color};font-size:10px;font-weight:800;padding:3px 5px;border-radius:5px;min-width:32px;text-align:center;">${ini}</div>
+          <div style="font-size:10px;color:${color === '#000' ? 'var(--green)' : color === '#fff' && bg === 'var(--blue)' ? 'var(--blue)' : bg === '#ef4444' ? '#ef4444' : 'var(--muted)'};">${icon}</div>
+        </div>`;
+      }).join('');
+
+      return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+          <span style="font-size:10px;color:var(--muted);">P${m.id} · ${m.date}</span>
+          <div style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;">
+            ${flagH} ${m.home}
+            <span style="background:var(--surface2);border:1px solid var(--accent);padding:2px 10px;border-radius:6px;color:var(--accent);font-size:16px;font-weight:800;">${r.home} - ${r.away}</span>
+            ${m.away} ${flagA}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">${playerResults}</div>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+
 function renderStandings() {
   const tbody = document.getElementById('standings-rows');
   const finishedCount = Object.keys(state.results).length;
@@ -553,11 +617,9 @@ function renderStandings() {
       </td>
     </tr>`;
   }).join('');
+  renderLastMatches();
 }
 
-// ========================
-// MATCHES
-// ========================
 let currentMatchFilter = 'all';
 function filterMatches(f, btn) {
   currentMatchFilter = f;
