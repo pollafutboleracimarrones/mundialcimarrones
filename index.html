@@ -537,60 +537,75 @@ function showTab(tab) {
 // ========================
 const INITIALS = {
   'Sr. Godoy':     'GDY',
-  'Mauricio Diaz': 'MDZ',
-  'Don Timba':     'DTB',
-  'Nono':          'NON',
-  'Andres Reina':  'ARE',
-  'John Triviño':  'JTV',
-  'Carlos Toro':   'CTO',
+  'Mauricio Diaz': 'MD',
+  'Don Timba':     'DT',
+  'Nono':          'NONO',
+  'Andres Reina':  'AR',
+  'John Triviño':  'JT',
+  'Carlos Toro':   'CT',
   'DJ Asesor':     'DJA'
 };
 
 function renderLastMatches() {
   const container = document.getElementById('last-matches-section');
-  // Get finished matches sorted by id descending (most recent first)
-  const finished = MATCHES_DATA.filter(m => state.results[m.id])
-    .sort((a, b) => b.id - a.id)
-    .slice(0, 6); // show last 6 matches
+  const finished = MATCHES_DATA.filter(m => state.results[m.id]);
 
   if (!finished.length) {
     container.innerHTML = '';
     return;
   }
 
+  // Group by date, newest first
+  const DATE_ORDER = ['Jun 11','Jun 12','Jun 13','Jun 14','Jun 15','Jun 16','Jun 17','Jun 18','Jun 19','Jun 20','Jun 21','Jun 22','Jun 23','Jun 24','Jun 25','Jun 26','Jun 27','Jun 28','Jun 29','Jun 30','Jul 1','Jul 2','Jul 3','Jul 4','Jul 5','Jul 6','Jul 7','Jul 9','Jul 10','Jul 11','Jul 14','Jul 15','Jul 18','Jul 19'];
+  const DATE_LABELS_R = {'Jun 11':'Miércoles 11 de Junio','Jun 12':'Jueves 12 de Junio','Jun 13':'Viernes 13 de Junio','Jun 14':'Sábado 14 de Junio','Jun 15':'Domingo 15 de Junio','Jun 16':'Lunes 16 de Junio','Jun 17':'Martes 17 de Junio','Jun 18':'Miércoles 18 de Junio','Jun 19':'Jueves 19 de Junio','Jun 20':'Viernes 20 de Junio','Jun 21':'Sábado 21 de Junio','Jun 22':'Domingo 22 de Junio','Jun 23':'Lunes 23 de Junio','Jun 24':'Martes 24 de Junio','Jun 25':'Miércoles 25 de Junio','Jun 26':'Jueves 26 de Junio','Jun 27':'Viernes 27 de Junio'};
+
+  const byDate = {};
+  finished.forEach(m => {
+    if (!byDate[m.date]) byDate[m.date] = [];
+    byDate[m.date].push(m);
+  });
+
+  const sortedDates = Object.keys(byDate).sort((a,b) => DATE_ORDER.indexOf(b) - DATE_ORDER.indexOf(a));
+
   container.innerHTML = `
-    <div style="font-size:13px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">⚽ Últimos Resultados</div>
-    ${finished.map(m => {
-      const r = state.results[m.id];
-      const flagH = FLAGS[m.home] || '🏳️';
-      const flagA = FLAGS[m.away] || '🏳️';
+    <div style="font-size:13px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">⚽ Resultados</div>
+    ${sortedDates.map(date => {
+      const label = DATE_LABELS_R[date] || date;
+      const matches = byDate[date].sort((a,b) => (a.time||'').localeCompare(b.time||''));
+      return `
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:12px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px;">📅 ${label}</div>
+        ${matches.map(m => {
+          const r = state.results[m.id];
+          const flagH = FLAGS[m.home] || '🏳️';
+          const flagA = FLAGS[m.away] || '🏳️';
 
-      const playerResults = PLAYERS.map(p => {
-        const pred = (state.predictions[p] || {})[m.id];
-        const pts = calcPoints(pred, r);
-        const ini = INITIALS[p] || p.substring(0,3).toUpperCase();
-        let bg, icon, color;
-        if (pts === 2)      { bg = 'var(--green)';   icon = '✓✓'; color = '#000'; }
-        else if (pts === 1) { bg = 'var(--blue)';    icon = '✓';  color = '#fff'; }
-        else if (pts === 0) { bg = '#ef4444';         icon = '✗';  color = '#fff'; }
-        else                { bg = 'var(--surface2)'; icon = '–';  color = 'var(--muted)'; }
-        return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
-          <div style="background:${bg};color:${color};font-size:10px;font-weight:800;padding:3px 5px;border-radius:5px;min-width:32px;text-align:center;">${ini}</div>
-          <div style="font-size:10px;color:${color === '#000' ? 'var(--green)' : color === '#fff' && bg === 'var(--blue)' ? 'var(--blue)' : bg === '#ef4444' ? '#ef4444' : 'var(--muted)'};">${icon}</div>
-        </div>`;
-      }).join('');
+          const playerResults = PLAYERS.map(p => {
+            const pred = (state.predictions[p] || {})[m.id];
+            const pts = calcPoints(pred, r);
+            const ini = INITIALS[p] || p.substring(0,3).toUpperCase();
+            let bg, icon, color;
+            if (pts === 2)      { bg='var(--green)';    icon='✓✓'; color='#000'; }
+            else if (pts === 1) { bg='var(--blue)';     icon='✓';  color='#fff'; }
+            else if (pts === 0) { bg='#ef4444';          icon='✗';  color='#fff'; }
+            else                { bg='var(--surface2)';  icon='–';  color='var(--muted)'; }
+            return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <div style="background:${bg};color:${color};font-size:9px;font-weight:800;padding:3px 5px;border-radius:4px;min-width:30px;text-align:center;line-height:1.2;">${ini}<br/>${icon}</div>
+            </div>`;
+          }).join('');
 
-      return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
-          <span style="font-size:10px;color:var(--muted);">P${m.id} · ${m.date}</span>
-          <div style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;">
-            ${flagH} ${m.home}
-            <span style="background:var(--surface2);border:1px solid var(--accent);padding:2px 10px;border-radius:6px;color:var(--accent);font-size:16px;font-weight:800;">${r.home} - ${r.away}</span>
-            ${m.away} ${flagA}
-          </div>
-        </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">${playerResults}</div>
-      </div>`;
+          return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+              <span style="font-size:10px;color:var(--muted);">${m.time||''} · Gr.${m.group}</span>
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;flex-wrap:wrap;">
+                ${flagH} ${m.home}
+                <span style="background:var(--surface2);border:1px solid var(--accent);padding:1px 8px;border-radius:5px;color:var(--accent);font-size:15px;font-weight:800;">${r.home}-${r.away}</span>
+                ${m.away} ${flagA}
+              </div>
+            </div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;">${playerResults}</div>
+          </div>`;
+        }).join('')}
+      `;
     }).join('')}
   `;
 }
