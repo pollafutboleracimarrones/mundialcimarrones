@@ -89,12 +89,11 @@
   /* PREDICCIONES */
   .pred-layout { display: grid; grid-template-columns: 220px 1fr; gap: 20px; }
   .player-sidebar { }
-  .player-list { display: flex; flex-direction: column; gap: 6px; }
-  .player-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; cursor: pointer; transition: all 0.2s; }
+  .player-list { display: flex; flex-direction: column; gap: 8px; }
+  .player-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; }
   .player-card:hover, .player-card.active { border-color: var(--accent); background: var(--surface2); }
-  .player-card.active { border-color: var(--accent); }
-  .player-card-name { font-weight: 700; font-size: 14px; }
-  .player-card-stats { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .player-card-name { font-weight: 700; font-size: 16px; }
+  .player-card-stats { font-size: 13px; color: var(--muted); margin-top: 2px; }
   .pred-content { }
   .pred-match-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 8px; }
   .pred-match-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -279,21 +278,20 @@
 
   <!-- PREDICCIONES -->
   <div id="tab-predicciones" class="section">
-    <div class="pred-layout">
-      <div class="player-sidebar">
-        <div style="font-size:13px; color:var(--muted); margin-bottom:10px; font-weight:600;">PARTICIPANTES</div>
-        <div class="player-list" id="player-list"></div>
+    <!-- Vista 1: Selector de jugador -->
+    <div id="pred-player-select">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:12px;font-weight:600;">SELECCIONA UN PARTICIPANTE</div>
+      <div id="player-list"></div>
+    </div>
+    <!-- Vista 2: Partidos del jugador seleccionado -->
+    <div id="pred-player-view" style="display:none;">
+      <div id="pred-header" style="margin-bottom:12px;"></div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
+        <button class="filter-btn active" onclick="filterPred('all',this)">Todos</button>
+        <button class="filter-btn" onclick="filterPred('pending',this)">Sin predicción</button>
+        <button class="filter-btn" onclick="filterPred('scored',this)">Con puntos</button>
       </div>
-      <div class="pred-content">
-        <div id="pred-header" style="margin-bottom:16px;"></div>
-        <div class="match-filters" style="margin-bottom:12px;">
-          <button class="filter-btn active" onclick="filterPred('all',this)">Todos</button>
-          <button class="filter-btn" onclick="filterPred('pending',this)">Sin predicción</button>
-          <button class="filter-btn" onclick="filterPred('scored',this)">Con puntos</button>
-          <input class="search-bar" id="pred-search" placeholder="🔍 Selección..." oninput="renderPredictions()" />
-        </div>
-        <div id="pred-list"></div>
-      </div>
+      <div id="pred-list"></div>
     </div>
   </div>
 
@@ -523,7 +521,11 @@ function showTab(tab) {
   event.target.classList.add('active');
   if (tab === 'tabla') renderStandings();
   if (tab === 'partidos') renderMatches();
-  if (tab === 'predicciones') renderPredictions();
+  if (tab === 'predicciones') {
+    document.getElementById('pred-player-select').style.display = 'block';
+    document.getElementById('pred-player-view').style.display = 'none';
+    renderPlayerList();
+  }
   if (tab === 'admin') renderAdmin();
 }
 
@@ -631,9 +633,15 @@ function filterPred(f, btn) {
 
 function selectPlayer(name) {
   state.selectedPlayer = name;
-  document.querySelectorAll('.player-card').forEach(c => c.classList.remove('active'));
-  event.currentTarget.classList.add('active');
+  document.getElementById('pred-player-select').style.display = 'none';
+  document.getElementById('pred-player-view').style.display = 'block';
   renderPredictions();
+}
+
+function backToPlayerList() {
+  document.getElementById('pred-player-select').style.display = 'block';
+  document.getElementById('pred-player-view').style.display = 'none';
+  renderPlayerList();
 }
 
 function renderPlayerList() {
@@ -641,24 +649,29 @@ function renderPlayerList() {
   container.innerHTML = PLAYERS.map(p => {
     const s = getPlayerStats(p);
     const lockedCount = Object.keys(state.locked[p] || {}).length;
-    return `<div class="player-card ${p===state.selectedPlayer?'active':''}" onclick="selectPlayer('${p}')">
-      <div class="player-card-name">${p}</div>
-      <div class="player-card-stats">${s.pts} pts · ${s.predCount} pred · ${lockedCount} 🔒</div>
+    return `<div class="player-card" onclick="selectPlayer('${p}')">
+      <div>
+        <div class="player-card-name">${p} ${lockedCount > 0 ? '🔒' : ''}</div>
+        <div class="player-card-stats">${s.pts} pts · ${s.predCount} predicciones · ${lockedCount} guardadas</div>
+      </div>
+      <span style="font-size:22px;color:var(--muted);">›</span>
     </div>`;
   }).join('');
 }
 
 function renderPredictions() {
-  renderPlayerList();
   const player = state.selectedPlayer;
   const preds = state.predictions[player] || {};
   const lockedMatches = state.locked[player] || {};
   const stats = getPlayerStats(player);
 
   document.getElementById('pred-header').innerHTML = `
-    <div>
-      <div style="font-size:18px;font-weight:800;color:var(--accent)">${player}</div>
-      <div style="font-size:13px;color:var(--muted);margin-top:4px;">${stats.pts} pts · ${stats.exact} exactos · ${stats.winner} ganador · ${stats.predCount} predicciones</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button onclick="backToPlayerList()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;">‹ Volver</button>
+      <div>
+        <div style="font-size:17px;font-weight:800;color:var(--accent);">${player}</div>
+        <div style="font-size:12px;color:var(--muted);">${stats.pts} pts · ${stats.predCount} predicciones</div>
+      </div>
     </div>
   `;
 
@@ -1022,7 +1035,7 @@ function showToast(msg, error=false) {
 loadState();
 renderStandings();
 renderMatches();
-renderPredictions();
+renderPlayerList();
 loadApiKey();
 </script>
 </body>
