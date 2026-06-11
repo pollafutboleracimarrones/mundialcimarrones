@@ -622,7 +622,7 @@ function renderStandings() {
     const pct = maxPts ? (p.pts/maxPts*100) : 0;
     return `<tr>
       <td class="rank ${rankClass}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td>
-      <td class="player-name">${p.name}</td>
+      <td class="player-name">${p.name}${INITIALS[p.name] && p.name !== 'Nono' ? ` <span style="color:var(--muted);font-size:11px;font-weight:500;">(${INITIALS[p.name]})</span>` : ''}</td>
       <td class="pts-cell">${p.pts}</td>
       <td><span style="color:var(--green);font-weight:700">${p.exact}</span> <span class="pts-detail">✓✓</span></td>
       <td><span style="color:var(--blue);font-weight:700">${p.winner}</span> <span class="pts-detail">✓</span></td>
