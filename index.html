@@ -575,17 +575,53 @@ function renderMatches() {
   if (currentMatchFilter === 'knockout') matches = matches.filter(m => m.phase === 'knockout');
   if (search) matches = matches.filter(m => m.home.toLowerCase().includes(search) || m.away.toLowerCase().includes(search) || (m.group||'').toLowerCase().includes(search));
 
+  const DATE_LABELS = {
+    'Jun 11': 'Miércoles 11 de Junio',
+    'Jun 12': 'Jueves 12 de Junio',
+    'Jun 13': 'Viernes 13 de Junio',
+    'Jun 14': 'Sábado 14 de Junio',
+    'Jun 15': 'Domingo 15 de Junio',
+    'Jun 16': 'Lunes 16 de Junio',
+    'Jun 17': 'Martes 17 de Junio',
+    'Jun 18': 'Miércoles 18 de Junio',
+    'Jun 19': 'Jueves 19 de Junio',
+    'Jun 20': 'Viernes 20 de Junio',
+    'Jun 21': 'Sábado 21 de Junio',
+    'Jun 22': 'Domingo 22 de Junio',
+    'Jun 23': 'Lunes 23 de Junio',
+    'Jun 24': 'Martes 24 de Junio',
+    'Jun 25': 'Miércoles 25 de Junio',
+    'Jun 26': 'Jueves 26 de Junio',
+    'Jun 27': 'Viernes 27 de Junio',
+  };
+
+  const DATE_ORDER = ['Jun 11','Jun 12','Jun 13','Jun 14','Jun 15','Jun 16','Jun 17','Jun 18','Jun 19','Jun 20','Jun 21','Jun 22','Jun 23','Jun 24','Jun 25','Jun 26','Jun 27','Jun 28','Jun 29','Jun 30','Jul 1','Jul 2','Jul 3','Jul 4','Jul 5','Jul 6','Jul 7','Jul 9','Jul 10','Jul 11','Jul 14','Jul 15','Jul 18','Jul 19'];
+
+  // Sort matches by date first, then time
+  matches.sort((a, b) => {
+    const di = DATE_ORDER.indexOf(a.date) - DATE_ORDER.indexOf(b.date);
+    if (di !== 0) return di;
+    return (a.time || '').localeCompare(b.time || '');
+  });
+
   const groups = {};
   matches.forEach(m => {
-    const gk = m.phase === 'groups' ? `Grupo ${m.group}` : m.group;
+    const gk = DATE_LABELS[m.date] || m.date;
     if (!groups[gk]) groups[gk] = [];
     groups[gk].push(m);
   });
 
-  const container = document.getElementById('matches-list');
-  if (!Object.keys(groups).length) { container.innerHTML = '<div style="color:var(--muted);padding:40px;text-align:center;">No se encontraron partidos</div>'; return; }
+  // Sort group keys by date order
+  const sortedGroups = Object.entries(groups).sort((a, b) => {
+    const dateA = Object.keys(DATE_LABELS).find(k => DATE_LABELS[k] === a[0]) || '';
+    const dateB = Object.keys(DATE_LABELS).find(k => DATE_LABELS[k] === b[0]) || '';
+    return DATE_ORDER.indexOf(dateA) - DATE_ORDER.indexOf(dateB);
+  });
 
-  container.innerHTML = Object.entries(groups).map(([gname, ms]) => `
+  const container = document.getElementById('matches-list');
+  if (!sortedGroups.length) { container.innerHTML = '<div style="color:var(--muted);padding:40px;text-align:center;">No se encontraron partidos</div>'; return; }
+
+  container.innerHTML = sortedGroups.map(([gname, ms]) => `
     <div class="match-group">
       <div class="group-header">${gname}</div>
       ${ms.map(m => {
@@ -594,7 +630,7 @@ function renderMatches() {
         const flagA = FLAGS[m.away] || '🏳️';
         const isKO = m.phase === 'knockout';
         return `<div class="match-card ${r?'finished':''} ${isKO?'knockout':''}">
-          <div class="match-info">${m.date}<br/>${m.time||''}<br/><span style="color:var(--border-light);font-size:10px">P${m.id}</span></div>
+          <div class="match-info">${m.time||''}<br/><span style="font-size:9px;">Gr.${m.group||''}</span><br/><span style="font-size:9px;color:var(--border)">P${m.id}</span></div>
           <div class="match-body">
             <div class="match-teams">
               <div class="team">
