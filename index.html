@@ -289,7 +289,7 @@
       <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
         <button class="filter-btn active" onclick="filterPred('all',this)">Todos</button>
         <button class="filter-btn" onclick="filterPred('pending',this)">Sin predicción</button>
-        <button class="filter-btn" onclick="filterPred('scored',this)">Con puntos</button>
+        <button class="filter-btn" onclick="filterPred('scored',this)">Con predicción</button>
       </div>
       <div id="pred-list"></div>
     </div>
@@ -714,7 +714,7 @@ function renderPredictions() {
   const search = document.getElementById('pred-search')?.value?.toLowerCase() || '';
   let matches = MATCHES_DATA;
   if (currentPredFilter === 'pending') matches = matches.filter(m => !lockedMatches[m.id]);
-  if (currentPredFilter === 'scored') matches = matches.filter(m => { const r = state.results[m.id]; const p = calcPoints(preds[m.id], r); return p !== null && p > 0; });
+  if (currentPredFilter === 'scored') matches = matches.filter(m => { const p = preds[m.id]; return p && p.home !== '' && p.home != null && p.away !== '' && p.away != null; });
   if (search) matches = matches.filter(m => m.home.toLowerCase().includes(search) || m.away.toLowerCase().includes(search));
 
   const container = document.getElementById('pred-list');
