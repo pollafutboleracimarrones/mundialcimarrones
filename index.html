@@ -1038,23 +1038,33 @@ async function syncResults() {
     const matches = Array.isArray(data) ? data : (data.matches || data.data || []);
     let updated = 0, log = [];
 
+    // Helper: normalize team name for fuzzy matching
+    function normalize(s) {
+      return s.toLowerCase()
+        .replace(/[áàä]/g,'a').replace(/[éèë]/g,'e').replace(/[íìï]/g,'i')
+        .replace(/[óòö]/g,'o').replace(/[úùü]/g,'u').replace(/ñ/g,'n')
+        .replace(/[^a-z0-9 ]/g,'').trim();
+    }
+
     matches.forEach(apiMatch => {
-      // wc2026api uses phase: FT or FT_PEN for finished
-      const isFinished = apiMatch.phase === 'FT' || apiMatch.phase === 'FT_PEN' || apiMatch.status === 'FT';
+      const isFinished = ['FT','FT_PEN','FINISHED','finished','completed'].includes(apiMatch.phase || apiMatch.status || '');
       if (!isFinished) return;
 
-      const homeTeam = (apiMatch.home_team || apiMatch.homeTeam || apiMatch.home || '').toLowerCase();
-      const awayTeam = (apiMatch.away_team || apiMatch.awayTeam || apiMatch.away || '').toLowerCase();
-      const homeScore = apiMatch.home_score ?? apiMatch.score?.home ?? apiMatch.goals?.home;
-      const awayScore = apiMatch.away_score ?? apiMatch.score?.away ?? apiMatch.goals?.away;
+      const homeTeam = normalize(apiMatch.home_team || apiMatch.homeTeam?.name || apiMatch.home?.name || apiMatch.home || '');
+      const awayTeam = normalize(apiMatch.away_team || apiMatch.awayTeam?.name || apiMatch.away?.name || apiMatch.away || '');
+      const homeScore = apiMatch.home_score ?? apiMatch.homeScore ?? apiMatch.score?.home ?? apiMatch.score?.fullTime?.home ?? apiMatch.goals?.home;
+      const awayScore = apiMatch.away_score ?? apiMatch.awayScore ?? apiMatch.score?.away ?? apiMatch.score?.fullTime?.away ?? apiMatch.goals?.away;
 
       if (homeScore == null || awayScore == null) return;
 
       const ourMatch = MATCHES_DATA.find(m => {
-        const h = m.home.toLowerCase();
-        const a = m.away.toLowerCase();
-        return (homeTeam.includes(h.split(' ')[0]) || h.includes(homeTeam.split(' ')[0])) &&
-               (awayTeam.includes(a.split(' ')[0]) || a.includes(awayTeam.split(' ')[0]));
+        const h = normalize(m.home);
+        const a = normalize(m.away);
+        const hWords = h.split(' ');
+        const aWords = a.split(' ');
+        const homeOk = homeTeam.includes(hWords[0]) || h.includes(homeTeam.split(' ')[0]) || hWords.some(w => w.length > 3 && homeTeam.includes(w));
+        const awayOk = awayTeam.includes(aWords[0]) || a.includes(awayTeam.split(' ')[0]) || aWords.some(w => w.length > 3 && awayTeam.includes(w));
+        return homeOk && awayOk;
       });
 
       if (ourMatch) {
@@ -1068,14 +1078,17 @@ async function syncResults() {
     });
 
     if (updated > 0) {
-      saveState(); renderMatches(); renderStandings();
+      saveState(); renderMatches(); renderStandings(); renderAdmin();
       statusEl.innerHTML = `<span style="color:var(--green);">✓ ${updated} resultado(s) actualizados</span>`;
       logEl.innerHTML = log.map(l => `<div>${l}</div>`).join('');
       showToast(`✓ ${updated} resultados sincronizados`);
     } else {
-      const finished = matches.filter(m => m.phase === 'FT' || m.phase === 'FT_PEN').length;
+      const finished = matches.filter(m => ['FT','FT_PEN','FINISHED','finished','completed'].includes(m.phase||m.status||'')).length;
       statusEl.innerHTML = `<span style="color:var(--muted);">✓ Todo al día (${finished} partidos terminados)</span>`;
-      logEl.innerHTML = `<div style="color:var(--muted);font-size:12px;">Sin cambios nuevos.</div>`;
+      logEl.innerHTML = `<div style="color:var(--muted);font-size:12px;">Sin cambios nuevos. Puedes ingresar resultados manualmente abajo.<br/>
+        <button onclick="document.getElementById('raw-log').style.display=document.getElementById('raw-log').style.display==='none'?'block':'none'" style="background:none;border:1px solid var(--border);color:var(--muted);padding:3px 8px;border-radius:4px;cursor:pointer;margin-top:6px;font-size:11px;">Ver datos API</button>
+        <pre id="raw-log" style="display:none;font-size:10px;color:var(--muted);margin-top:6px;overflow:auto;max-height:150px;">${JSON.stringify(matches.slice(0,2), null, 2)}</pre>
+      </div>`;
     }
 
   } catch (err) {
