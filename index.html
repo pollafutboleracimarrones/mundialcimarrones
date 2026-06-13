@@ -1138,11 +1138,19 @@ async function syncResults() {
       logEl.innerHTML = log.map(l => `<div>${l}</div>`).join('');
       showToast(`✓ ${updated} resultados sincronizados`);
     } else {
-      const finished = matches.filter(m => ['FT','FT_PEN','FINISHED','finished','completed'].includes(m.phase||m.status||'')).length;
-      statusEl.innerHTML = `<span style="color:var(--muted);">✓ Todo al día (${finished} partidos terminados)</span>`;
-      logEl.innerHTML = `<div style="color:var(--muted);font-size:12px;">Sin cambios nuevos. Puedes ingresar resultados manualmente abajo.<br/>
-        <button onclick="document.getElementById('raw-log').style.display=document.getElementById('raw-log').style.display==='none'?'block':'none'" style="background:none;border:1px solid var(--border);color:var(--muted);padding:3px 8px;border-radius:4px;cursor:pointer;margin-top:6px;font-size:11px;">Ver datos API</button>
-        <pre id="raw-log" style="display:none;font-size:10px;color:var(--muted);margin-top:6px;overflow:auto;max-height:150px;">${JSON.stringify(matches.slice(0,2), null, 2)}</pre>
+      // Build debug info
+      const debugInfo = matches.map(m => ({
+        home: m.home_team || m.home,
+        away: m.away_team || m.away,
+        status: m.phase || m.status || m.match_status || m.state,
+        home_score: m.home_score,
+        away_score: m.away_score,
+        finished: m.finished
+      }));
+      statusEl.innerHTML = `<span style="color:var(--muted);">Total partidos API: ${matches.length}</span>`;
+      logEl.innerHTML = `<div style="color:var(--muted);font-size:12px;">
+        <button onclick="document.getElementById('raw-log').style.display=document.getElementById('raw-log').style.display==='none'?'block':'none'" style="background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;">🔍 Ver datos API (${matches.length} partidos)</button>
+        <pre id="raw-log" style="display:none;font-size:10px;color:var(--text);margin-top:6px;overflow:auto;max-height:300px;white-space:pre-wrap;background:var(--surface2);padding:8px;border-radius:6px;">${JSON.stringify(debugInfo, null, 2)}</pre>
       </div>`;
     }
 
