@@ -825,7 +825,7 @@ function renderPredictions() {
     const disabledAttr = isMatchLocked ? 'disabled' : '';
     const inputStyle = isMatchLocked ? 'style="cursor:not-allowed;background:#fff;color:#111;font-weight:800;border:2px solid var(--green);"' : '';
 
-    return `<div class="pred-match-card" style="${isMatchLocked ? 'border-left:3px solid var(--green);' : ''}">
+    return `<div class="pred-match-card" id="pred-card-${m.id}" style="${isMatchLocked ? 'border-left:3px solid var(--green);' : ''}">
       <div class="pred-match-header">
         <div style="font-size:12px;color:var(--muted);">P${m.id} · ${m.date} · ${m.time||''} · ${m.phase==='groups'?'Grupo '+m.group:m.group}</div>
         <div style="display:flex;gap:6px;align-items:center;">
@@ -850,7 +850,7 @@ function renderPredictions() {
         </div>
         ${result ? `<div style="font-size:11px;color:var(--muted);text-align:right;">Resultado real: ${result.home}-${result.away}</div>` : ''}
         ${!isMatchLocked && hasAnyValue
-          ? `<button class="btn btn-primary" style="width:100%;margin-top:4px;" onclick="lockMatch('${player}',${m.id})">🔒 Guardar pronóstico</button>`
+          ? `<button id="save-btn-${m.id}" class="btn btn-primary" style="width:100%;margin-top:4px;" onclick="lockMatch('${player}',${m.id})">🔒 Guardar pronóstico</button>`
           : ''}
       </div>
     </div>`;
@@ -872,6 +872,24 @@ function savePred(player, matchId, side, val) {
   state.predictions[player][matchId][side] = val === '' ? '' : parseInt(val);
   saveState();
   renderPlayerList();
+
+  // Show/hide save button dynamically without full re-render
+  const pred = state.predictions[player][matchId];
+  const hasAny = (pred.home !== '' && pred.home != null) || (pred.away !== '' && pred.away != null);
+  const btnId = `save-btn-${matchId}`;
+  let btn = document.getElementById(btnId);
+  if (hasAny && !btn) {
+    const container = document.getElementById(`pred-card-${matchId}`);
+    if (container) {
+      const newBtn = document.createElement('button');
+      newBtn.id = btnId;
+      newBtn.className = 'btn btn-primary';
+      newBtn.style.cssText = 'width:100%;margin-top:8px;';
+      newBtn.textContent = '🔒 Guardar pronóstico';
+      newBtn.onclick = () => lockMatch(player, matchId);
+      container.appendChild(newBtn);
+    }
+  }
 }
 
 function unlockPlayer(player) {
