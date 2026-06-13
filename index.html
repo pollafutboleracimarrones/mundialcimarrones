@@ -571,7 +571,7 @@ function renderLastMatches() {
     <div style="font-size:13px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">⚽ Resultados</div>
     ${sortedDates.map(date => {
       const label = DATE_LABELS_R[date] || date;
-      const matches = byDate[date].sort((a,b) => (a.time||'').localeCompare(b.time||''));
+      const matches = byDate[date].sort((a,b) => timeToMinutes(a.time) - timeToMinutes(b.time));
       return `
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:12px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px;">📅 ${label}</div>
         ${matches.map(m => {
@@ -635,6 +635,16 @@ function renderStandings() {
   renderLastMatches();
 }
 
+function timeToMinutes(t) {
+  if (!t) return 0;
+  const m = t.match(/(\d+):(\d+)(am|pm)/i);
+  if (!m) return 0;
+  let h = parseInt(m[1]), min = parseInt(m[2]), ampm = m[3].toLowerCase();
+  if (ampm === 'pm' && h !== 12) h += 12;
+  if (ampm === 'am' && h === 12) h = 0;
+  return h * 60 + min;
+}
+
 let currentMatchFilter = 'all';
 function filterMatches(f, btn) {
   currentMatchFilter = f;
@@ -674,11 +684,10 @@ function renderMatches() {
 
   const DATE_ORDER = ['Jun 11','Jun 12','Jun 13','Jun 14','Jun 15','Jun 16','Jun 17','Jun 18','Jun 19','Jun 20','Jun 21','Jun 22','Jun 23','Jun 24','Jun 25','Jun 26','Jun 27','Jun 28','Jun 29','Jun 30','Jul 1','Jul 2','Jul 3','Jul 4','Jul 5','Jul 6','Jul 7','Jul 9','Jul 10','Jul 11','Jul 14','Jul 15','Jul 18','Jul 19'];
 
-  // Sort matches by date first, then time
   matches.sort((a, b) => {
     const di = DATE_ORDER.indexOf(a.date) - DATE_ORDER.indexOf(b.date);
     if (di !== 0) return di;
-    return (a.time || '').localeCompare(b.time || '');
+    return timeToMinutes(a.time) - timeToMinutes(b.time);
   });
 
   const groups = {};
@@ -804,7 +813,7 @@ function renderPredictions() {
     const flagH = FLAGS[m.home] || '🏳️';
     const flagA = FLAGS[m.away] || '🏳️';
     const isMatchLocked = !!lockedMatches[m.id];
-    const hasBothValues = pred.home !== '' && pred.home != null && pred.away !== '' && pred.away != null;
+    const hasAnyValue = (pred.home !== '' && pred.home != null) || (pred.away !== '' && pred.away != null);
 
     let ptsHtml = '';
     if (result) {
@@ -840,7 +849,7 @@ function renderPredictions() {
             ${isMatchLocked ? '' : `oninput="savePred('${player}',${m.id},'away',this.value)"`} />
         </div>
         ${result ? `<div style="font-size:11px;color:var(--muted);text-align:right;">Resultado real: ${result.home}-${result.away}</div>` : ''}
-        ${!isMatchLocked && hasBothValues
+        ${!isMatchLocked && hasAnyValue
           ? `<button class="btn btn-primary" style="width:100%;margin-top:4px;" onclick="lockMatch('${player}',${m.id})">🔒 Guardar pronóstico</button>`
           : ''}
       </div>
