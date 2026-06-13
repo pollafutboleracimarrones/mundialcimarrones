@@ -1067,25 +1067,68 @@ async function syncResults() {
 
     // Mapa inglés → español para nombres de equipos de la API
     const TEAM_MAP = {
-      'mexico': 'méxico', 'south africa': 'sudáfrica', 'south korea': 'corea del sur',
-      'czech republic': 'rep. checa', 'czechia': 'rep. checa',
-      'canada': 'canadá', 'bosnia and herzegovina': 'bosnia y herzegovina',
-      'bosnia & herzegovina': 'bosnia y herzegovina', 'qatar': 'qatar', 'switzerland': 'suiza',
-      'brazil': 'brasil', 'morocco': 'marruecos', 'haiti': 'haití', 'scotland': 'escocia',
-      'united states': 'estados unidos', 'usa': 'estados unidos', 'paraguay': 'paraguay',
-      'australia': 'australia', 'turkey': 'turquía', 'turkiye': 'turquía',
-      'germany': 'alemania', 'curacao': 'curazao', 'ivory coast': 'costa de marfil',
-      "cote d'ivoire": 'costa de marfil', 'ecuador': 'ecuador',
-      'netherlands': 'países bajos', 'holland': 'países bajos',
-      'japan': 'japón', 'sweden': 'suecia', 'tunisia': 'túnez',
-      'belgium': 'bélgica', 'egypt': 'egipto', 'iran': 'irán', 'new zealand': 'nueva zelanda',
-      'spain': 'españa', 'cape verde': 'cabo verde', 'saudi arabia': 'arabia saudita',
-      'uruguay': 'uruguay', 'france': 'francia', 'senegal': 'senegal',
-      'iraq': 'irak', 'norway': 'noruega', 'argentina': 'argentina',
-      'algeria': 'argelia', 'austria': 'austria', 'jordan': 'jordania',
-      'portugal': 'portugal', 'dr congo': 'rd de congo', 'democratic republic of congo': 'rd de congo',
-      'uzbekistan': 'uzbekistán', 'colombia': 'colombia',
-      'england': 'inglaterra', 'croatia': 'croacia', 'ghana': 'ghana', 'panama': 'panamá'
+      'mexico': 'méxico',
+      'south africa': 'sudáfrica',
+      'korea republic': 'corea del sur',
+      'south korea': 'corea del sur',
+      'czechia': 'rep. checa',
+      'czech republic': 'rep. checa',
+      'canada': 'canadá',
+      'bosnia-herzegovina': 'bosnia y herzegovina',
+      'bosnia and herzegovina': 'bosnia y herzegovina',
+      'bosnia & herzegovina': 'bosnia y herzegovina',
+      'qatar': 'qatar',
+      'switzerland': 'suiza',
+      'brazil': 'brasil',
+      'morocco': 'marruecos',
+      'haiti': 'haití',
+      'scotland': 'escocia',
+      'usa': 'estados unidos',
+      'united states': 'estados unidos',
+      'paraguay': 'paraguay',
+      'australia': 'australia',
+      'turkey': 'turquía',
+      'turkiye': 'turquía',
+      'germany': 'alemania',
+      'curaçao': 'curazao',
+      'curacao': 'curazao',
+      "côte d'ivoire": 'costa de marfil',
+      "cote d'ivoire": 'costa de marfil',
+      'ivory coast': 'costa de marfil',
+      'ecuador': 'ecuador',
+      'netherlands': 'países bajos',
+      'holland': 'países bajos',
+      'japan': 'japón',
+      'sweden': 'suecia',
+      'tunisia': 'túnez',
+      'belgium': 'bélgica',
+      'egypt': 'egipto',
+      'ir iran': 'irán',
+      'iran': 'irán',
+      'new zealand': 'nueva zelanda',
+      'spain': 'españa',
+      'cabo verde': 'cabo verde',
+      'cape verde': 'cabo verde',
+      'saudi arabia': 'arabia saudita',
+      'uruguay': 'uruguay',
+      'france': 'francia',
+      'senegal': 'senegal',
+      'iraq': 'irak',
+      'norway': 'noruega',
+      'argentina': 'argentina',
+      'algeria': 'argelia',
+      'austria': 'austria',
+      'jordan': 'jordania',
+      'portugal': 'portugal',
+      'congo dr': 'rd de congo',
+      'dr congo': 'rd de congo',
+      'democratic republic of congo': 'rd de congo',
+      'uzbekistan': 'uzbekistán',
+      'colombia': 'colombia',
+      'england': 'inglaterra',
+      'croatia': 'croacia',
+      'ghana': 'ghana',
+      'panama': 'panamá'
     };
 
     function normalize(s) {
@@ -1101,8 +1144,8 @@ async function syncResults() {
     }
 
     matches.forEach(apiMatch => {
-      const statusVal = (apiMatch.phase || apiMatch.status || apiMatch.match_status || apiMatch.state || '').toString().toLowerCase();
-      const isFinished = ['ft','ft_pen','finished','completed','full-time','fulltime','1'].includes(statusVal) || apiMatch.finished === true || (apiMatch.home_score != null && apiMatch.away_score != null && statusVal !== 'scheduled' && statusVal !== 'upcoming' && statusVal !== 'tbd' && statusVal !== '');
+      const statusVal = (apiMatch.status || '').toString().toUpperCase();
+      const isFinished = statusVal === 'FT' || statusVal === 'FT_PEN';
       if (!isFinished) return;
 
       const rawHome = apiMatch.home_team || apiMatch.homeTeam?.name || apiMatch.home?.name || apiMatch.home || '';
