@@ -1061,8 +1061,10 @@ async function syncResults() {
     }
 
     const data = await response.json();
-    // wc2026api returns array directly or {matches: [...]}
-    const matches = Array.isArray(data) ? data : (data.matches || data.data || []);
+    // Log raw structure for debugging
+    console.log('API raw response type:', Array.isArray(data) ? 'array' : typeof data);
+    console.log('API first item:', JSON.stringify(Array.isArray(data) ? data[0] : data, null, 2));
+    const matches = Array.isArray(data) ? data : (data.matches || data.data || data.results || []);
     let updated = 0, log = [];
 
     // Mapa inglés → español para nombres de equipos de la API
@@ -1193,7 +1195,7 @@ async function syncResults() {
       statusEl.innerHTML = `<span style="color:var(--muted);">Total partidos API: ${matches.length}</span>`;
       logEl.innerHTML = `<div style="color:var(--muted);font-size:12px;">
         <button onclick="document.getElementById('raw-log').style.display=document.getElementById('raw-log').style.display==='none'?'block':'none'" style="background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;">🔍 Ver datos API (${matches.length} partidos)</button>
-        <pre id="raw-log" style="display:none;font-size:10px;color:var(--text);margin-top:6px;overflow:auto;max-height:300px;white-space:pre-wrap;background:var(--surface2);padding:8px;border-radius:6px;">${JSON.stringify(debugInfo, null, 2)}</pre>
+        <pre id="raw-log" style="display:none;font-size:10px;color:var(--text);margin-top:6px;overflow:auto;max-height:300px;white-space:pre-wrap;background:var(--surface2);padding:8px;border-radius:6px;">${JSON.stringify(matches.slice(0,3), null, 2)}</pre>
       </div>`;
     }
 
