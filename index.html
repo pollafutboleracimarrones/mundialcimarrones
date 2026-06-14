@@ -1146,16 +1146,16 @@ async function syncResults() {
     }
 
     matches.forEach(apiMatch => {
-      const statusVal = (apiMatch.status || '').toString().toUpperCase();
-      const isFinished = statusVal === 'FT' || statusVal === 'FT_PEN';
+      const statusVal = (apiMatch.status || '').toLowerCase();
+      const isFinished = statusVal === 'completed' || statusVal === 'ft' || statusVal === 'ft_pen';
       if (!isFinished) return;
 
-      const rawHome = apiMatch.home_team || apiMatch.homeTeam?.name || apiMatch.home?.name || apiMatch.home || '';
-      const rawAway = apiMatch.away_team || apiMatch.awayTeam?.name || apiMatch.away?.name || apiMatch.away || '';
+      const rawHome = apiMatch.home_team || '';
+      const rawAway = apiMatch.away_team || '';
       const homeTeam = normalize(translateTeam(rawHome));
       const awayTeam = normalize(translateTeam(rawAway));
-      const homeScore = apiMatch.home_score ?? apiMatch.homeScore ?? apiMatch.score?.home ?? apiMatch.score?.fullTime?.home ?? apiMatch.goals?.home;
-      const awayScore = apiMatch.away_score ?? apiMatch.awayScore ?? apiMatch.score?.away ?? apiMatch.score?.fullTime?.away ?? apiMatch.goals?.away;
+      const homeScore = apiMatch.home_score;
+      const awayScore = apiMatch.away_score;
 
       if (homeScore == null || awayScore == null) return;
 
