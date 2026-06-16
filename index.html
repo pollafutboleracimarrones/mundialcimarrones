@@ -231,7 +231,8 @@
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="showTab('tabla')">📊<span>Posiciones</span></button>
       <button class="tab-btn" onclick="showTab('partidos')">⚽<span>Partidos</span></button>
-      <button class="tab-btn" onclick="showTab('predicciones')">🎯<span>Predicciones</span></button>
+      <button class="tab-btn" onclick="showTab('grupos')">🏟️<span>Grupos</span></button>
+      <button class="tab-btn" onclick="showTab('predicciones')">🎯<span>Pred.</span></button>
       <button class="tab-btn" onclick="showTab('admin')">⚙️<span>Admin</span></button>
     </div>
   </div>
@@ -277,6 +278,15 @@
       <input class="search-bar" id="match-search" placeholder="🔍 Buscar selección..." oninput="renderMatches()" />
     </div>
     <div id="matches-list"></div>
+  </div>
+
+  <!-- GRUPOS -->
+  <div id="tab-grupos" class="section">
+    <div style="margin-bottom:16px;">
+      <div style="font-size:20px;font-weight:800;">Tabla de Grupos</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Se actualiza automáticamente con cada sincronización</div>
+    </div>
+    <div id="grupos-list"></div>
   </div>
 
   <!-- PREDICCIONES -->
@@ -524,6 +534,7 @@ function showTab(tab) {
   event.target.classList.add('active');
   if (tab === 'tabla') renderStandings();
   if (tab === 'partidos') renderMatches();
+  if (tab === 'grupos') renderGrupos();
   if (tab === 'predicciones') {
     document.getElementById('pred-player-select').style.display = 'block';
     document.getElementById('pred-player-view').style.display = 'none';
@@ -611,6 +622,80 @@ function renderLastMatches() {
 }
 
 
+// ========================
+// GRUPOS
+// ========================
+function renderGrupos() {
+  const container = document.getElementById('grupos-list');
+  const groupStandings = {};
+
+  Object.entries(GROUPS).forEach(([grp, teams]) => {
+    groupStandings[grp] = teams.map(team => ({
+      team, pts:0, pj:0, pg:0, pe:0, pp:0, gf:0, gc:0, dg:0
+    }));
+  });
+
+  MATCHES_DATA.filter(m => m.phase === 'groups' && state.results[m.id]).forEach(m => {
+    const r = state.results[m.id];
+    const grp = m.group;
+    if (!groupStandings[grp]) return;
+    const homeEntry = groupStandings[grp].find(e => e.team === m.home);
+    const awayEntry = groupStandings[grp].find(e => e.team === m.away);
+    if (!homeEntry || !awayEntry) return;
+    const hg = parseInt(r.home), ag = parseInt(r.away);
+    homeEntry.pj++; homeEntry.gf+=hg; homeEntry.gc+=ag; homeEntry.dg+=(hg-ag);
+    awayEntry.pj++; awayEntry.gf+=ag; awayEntry.gc+=hg; awayEntry.dg+=(ag-hg);
+    if (hg > ag)      { homeEntry.pg++; homeEntry.pts+=3; awayEntry.pp++; }
+    else if (hg < ag) { awayEntry.pg++; awayEntry.pts+=3; homeEntry.pp++; }
+    else              { homeEntry.pe++; homeEntry.pts++; awayEntry.pe++; awayEntry.pts++; }
+  });
+
+  Object.keys(groupStandings).forEach(grp => {
+    groupStandings[grp].sort((a,b) => b.pts-a.pts || b.dg-a.dg || b.gf-a.gf);
+  });
+
+  container.innerHTML = Object.entries(groupStandings).map(([grp, teams]) => {
+    const rows = teams.map((t,i) => {
+      const classified = i < 2;
+      return `<tr style="${classified?'background:rgba(34,197,94,0.08);':''}">
+        <td style="padding:8px 6px;font-size:12px;color:var(--muted);">${i+1}</td>
+        <td style="padding:8px 4px;font-size:13px;font-weight:${classified?700:400};">
+          ${FLAGS[t.team]||'🏳️'} ${t.team}${classified?' <span style="color:var(--green);font-size:10px;">✓</span>':''}
+        </td>
+        <td style="padding:8px 4px;text-align:center;font-size:12px;color:var(--muted);">${t.pj}</td>
+        <td style="padding:8px 4px;text-align:center;font-size:12px;color:var(--green);">${t.pg}</td>
+        <td style="padding:8px 4px;text-align:center;font-size:12px;color:var(--muted);">${t.pe}</td>
+        <td style="padding:8px 4px;text-align:center;font-size:12px;color:#ef4444;">${t.pp}</td>
+        <td style="padding:8px 4px;text-align:center;font-size:11px;color:var(--muted);">${t.gf}:${t.gc}</td>
+        <td style="padding:8px 4px;text-align:center;font-size:12px;color:${t.dg>0?'var(--green)':t.dg<0?'#ef4444':'var(--muted)'};">${t.dg>0?'+':''}${t.dg}</td>
+        <td style="padding:8px 6px;text-align:center;font-size:15px;font-weight:800;color:var(--accent);">${t.pts}</td>
+      </tr>`;
+    }).join('');
+
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;">
+      <div style="background:var(--surface2);padding:8px 14px;font-size:12px;font-weight:700;color:var(--accent);letter-spacing:1px;border-bottom:1px solid var(--border);">GRUPO ${grp}</div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="border-bottom:1px solid var(--border);">
+          <th style="padding:5px 6px;font-size:9px;color:var(--muted);text-align:left;">#</th>
+          <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:left;">EQUIPO</th>
+          <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;" title="Partidos Jugados">PJ</th>
+          <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;" title="Ganados">G</th>
+          <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;" title="Empatados">E</th>
+          <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;" title="Perdidos">P</th>
+          <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;">GF:GC</th>
+          <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;">DG</th>
+          <th style="padding:5px 6px;font-size:9px;color:var(--muted);text-align:center;">PTS</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div style="padding:5px 10px;font-size:10px;color:var(--green);border-top:1px solid var(--border);">✓ Clasifican los 2 primeros</div>
+    </div>`;
+  }).join('');
+}
+
+// ========================
+// STANDINGS
+// ========================
 function renderStandings() {
   const tbody = document.getElementById('standings-rows');
   const finishedCount = Object.keys(state.results).length;
@@ -1178,7 +1263,7 @@ async function syncResults() {
     });
 
     if (updated > 0) {
-      saveState(); renderMatches(); renderStandings(); renderAdmin();
+      saveState(); renderMatches(); renderStandings(); renderGrupos(); renderAdmin();
       statusEl.innerHTML = `<span style="color:var(--green);">✓ ${updated} resultado(s) actualizados</span>`;
       logEl.innerHTML = log.map(l => `<div>${l}</div>`).join('');
       showToast(`✓ ${updated} resultados sincronizados`);
