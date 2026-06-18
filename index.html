@@ -568,7 +568,7 @@ function renderLastMatches() {
 
   // Group by date, newest first
   const DATE_ORDER = ['Jun 11','Jun 12','Jun 13','Jun 14','Jun 15','Jun 16','Jun 17','Jun 18','Jun 19','Jun 20','Jun 21','Jun 22','Jun 23','Jun 24','Jun 25','Jun 26','Jun 27','Jun 28','Jun 29','Jun 30','Jul 1','Jul 2','Jul 3','Jul 4','Jul 5','Jul 6','Jul 7','Jul 9','Jul 10','Jul 11','Jul 14','Jul 15','Jul 18','Jul 19'];
-  const DATE_LABELS_R = {'Jun 11':'Miércoles 11 de Junio','Jun 12':'Jueves 12 de Junio','Jun 13':'Viernes 13 de Junio','Jun 14':'Sábado 14 de Junio','Jun 15':'Domingo 15 de Junio','Jun 16':'Lunes 16 de Junio','Jun 17':'Martes 17 de Junio','Jun 18':'Miércoles 18 de Junio','Jun 19':'Jueves 19 de Junio','Jun 20':'Viernes 20 de Junio','Jun 21':'Sábado 21 de Junio','Jun 22':'Domingo 22 de Junio','Jun 23':'Lunes 23 de Junio','Jun 24':'Martes 24 de Junio','Jun 25':'Miércoles 25 de Junio','Jun 26':'Jueves 26 de Junio','Jun 27':'Viernes 27 de Junio'};
+  const DATE_LABELS_R = {'Jun 11':'Jueves 11 de Junio','Jun 12':'Viernes 12 de Junio','Jun 13':'Sábado 13 de Junio','Jun 14':'Domingo 14 de Junio','Jun 15':'Lunes 15 de Junio','Jun 16':'Martes 16 de Junio','Jun 17':'Miércoles 17 de Junio','Jun 18':'Jueves 18 de Junio','Jun 19':'Viernes 19 de Junio','Jun 20':'Sábado 20 de Junio','Jun 21':'Domingo 21 de Junio','Jun 22':'Lunes 22 de Junio','Jun 23':'Martes 23 de Junio','Jun 24':'Miércoles 24 de Junio','Jun 25':'Jueves 25 de Junio','Jun 26':'Viernes 26 de Junio','Jun 27':'Sábado 27 de Junio'};
 
   const byDate = {};
   finished.forEach(m => {
@@ -750,23 +750,23 @@ function renderMatches() {
   if (search) matches = matches.filter(m => m.home.toLowerCase().includes(search) || m.away.toLowerCase().includes(search) || (m.group||'').toLowerCase().includes(search));
 
   const DATE_LABELS = {
-    'Jun 11': 'Miércoles 11 de Junio',
-    'Jun 12': 'Jueves 12 de Junio',
-    'Jun 13': 'Viernes 13 de Junio',
-    'Jun 14': 'Sábado 14 de Junio',
-    'Jun 15': 'Domingo 15 de Junio',
-    'Jun 16': 'Lunes 16 de Junio',
-    'Jun 17': 'Martes 17 de Junio',
-    'Jun 18': 'Miércoles 18 de Junio',
-    'Jun 19': 'Jueves 19 de Junio',
-    'Jun 20': 'Viernes 20 de Junio',
-    'Jun 21': 'Sábado 21 de Junio',
-    'Jun 22': 'Domingo 22 de Junio',
-    'Jun 23': 'Lunes 23 de Junio',
-    'Jun 24': 'Martes 24 de Junio',
-    'Jun 25': 'Miércoles 25 de Junio',
-    'Jun 26': 'Jueves 26 de Junio',
-    'Jun 27': 'Viernes 27 de Junio',
+    'Jun 11': 'Jueves 11 de Junio',
+    'Jun 12': 'Viernes 12 de Junio',
+    'Jun 13': 'Sábado 13 de Junio',
+    'Jun 14': 'Domingo 14 de Junio',
+    'Jun 15': 'Lunes 15 de Junio',
+    'Jun 16': 'Martes 16 de Junio',
+    'Jun 17': 'Miércoles 17 de Junio',
+    'Jun 18': 'Jueves 18 de Junio',
+    'Jun 19': 'Viernes 19 de Junio',
+    'Jun 20': 'Sábado 20 de Junio',
+    'Jun 21': 'Domingo 21 de Junio',
+    'Jun 22': 'Lunes 22 de Junio',
+    'Jun 23': 'Martes 23 de Junio',
+    'Jun 24': 'Miércoles 24 de Junio',
+    'Jun 25': 'Jueves 25 de Junio',
+    'Jun 26': 'Viernes 26 de Junio',
+    'Jun 27': 'Sábado 27 de Junio',
   };
 
   const DATE_ORDER = ['Jun 11','Jun 12','Jun 13','Jun 14','Jun 15','Jun 16','Jun 17','Jun 18','Jun 19','Jun 20','Jun 21','Jun 22','Jun 23','Jun 24','Jun 25','Jun 26','Jun 27','Jun 28','Jun 29','Jun 30','Jul 1','Jul 2','Jul 3','Jul 4','Jul 5','Jul 6','Jul 7','Jul 9','Jul 10','Jul 11','Jul 14','Jul 15','Jul 18','Jul 19'];
