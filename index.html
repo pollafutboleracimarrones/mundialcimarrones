@@ -989,8 +989,18 @@ function renderPredictions() {
   `;
 
   const search = document.getElementById('pred-search')?.value?.toLowerCase() || '';
-  let matches = MATCHES_DATA;
-  if (currentPredFilter === 'pending') matches = matches.filter(m => !lockedMatches[m.id]);
+  let matches = [...MATCHES_DATA];
+
+  // Sort: groups by date+time first, knockout last
+  const DATE_ORDER_PRED = ['Jun 11','Jun 12','Jun 13','Jun 14','Jun 15','Jun 16','Jun 17','Jun 18','Jun 19','Jun 20','Jun 21','Jun 22','Jun 23','Jun 24','Jun 25','Jun 26','Jun 27','Jun 28','Jun 29','Jun 30','Jul 1','Jul 2','Jul 3','Jul 4','Jul 5','Jul 6','Jul 7','Jul 8','Jul 9','Jul 10','Jul 12','Jul 14','Jul 17','Jul 19'];
+  matches.sort((a, b) => {
+    if (a.phase !== b.phase) return a.phase === 'groups' ? -1 : 1;
+    const di = DATE_ORDER_PRED.indexOf(a.date) - DATE_ORDER_PRED.indexOf(b.date);
+    if (di !== 0) return di;
+    return timeToMinutes(a.time) - timeToMinutes(b.time);
+  });
+
+  if (currentPredFilter === 'pending') matches = matches.filter(m => { const p = preds[m.id]; return !p || p.home == null || p.home === '' || p.away == null || p.away === ''; });
   if (currentPredFilter === 'scored') matches = matches.filter(m => { const p = preds[m.id]; return p && p.home !== '' && p.home != null && p.away !== '' && p.away != null; });
   if (search) matches = matches.filter(m => m.home.toLowerCase().includes(search) || m.away.toLowerCase().includes(search));
 
