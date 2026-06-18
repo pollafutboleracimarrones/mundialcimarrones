@@ -1240,7 +1240,7 @@ async function syncResults() {
     console.log('API raw response type:', Array.isArray(data) ? 'array' : typeof data);
     console.log('API first item:', JSON.stringify(Array.isArray(data) ? data[0] : data, null, 2));
     const matches = Array.isArray(data) ? data : (data.matches || data.data || data.results || []);
-    let updated = 0, log = [];
+    let updated = 0, log = [], noMatch = [];
 
     // Mapa inglés → español para nombres de equipos de la API
     const TEAM_MAP = {
@@ -1337,9 +1337,7 @@ async function syncResults() {
       const ourMatch = MATCHES_DATA.find(m => {
         const h = normalize(m.home);
         const a = normalize(m.away);
-        return h === homeTeam && a === awayTeam ||
-               h.includes(homeTeam) || homeTeam.includes(h) ||
-               a.includes(awayTeam) || awayTeam.includes(a);
+        return h === homeTeam && a === awayTeam;
       });
 
       if (ourMatch) {
@@ -1348,30 +1346,27 @@ async function syncResults() {
           state.results[ourMatch.id] = { home: homeScore, away: awayScore };
           updated++;
           log.push(`✓ P${ourMatch.id} ${ourMatch.home} ${homeScore}-${awayScore} ${ourMatch.away}`);
+        } else {
+          log.push(`= P${ourMatch.id} ${ourMatch.home} ${homeScore}-${awayScore} ${ourMatch.away} (sin cambio)`);
         }
+      } else {
+        noMatch.push(`❓ "${rawHome}" vs "${rawAway}" → traducido: "${homeTeam}" vs "${awayTeam}"`);
       }
     });
 
+    const debugBtn = `<button onclick="document.getElementById('raw-log').style.display=document.getElementById('raw-log').style.display==='none'?'block':'none'" style="background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;margin-top:8px;">🔍 Ver datos API</button>
+      <pre id="raw-log" style="display:none;font-size:10px;color:var(--text);margin-top:6px;overflow:auto;max-height:250px;white-space:pre-wrap;background:var(--surface2);padding:8px;border-radius:6px;">${JSON.stringify(matches.filter(m=>m.status==='completed').slice(0,5), null, 2)}</pre>`;
+
     if (updated > 0) {
       saveState(); renderMatches(); renderStandings(); renderGrupos(); renderAdmin();
-      statusEl.innerHTML = `<span style="color:var(--green);">✓ ${updated} resultado(s) actualizados</span>`;
-      logEl.innerHTML = log.map(l => `<div>${l}</div>`).join('');
+      statusEl.innerHTML = `<span style="color:var(--green);">✓ ${updated} actualizado(s)</span>`;
+      logEl.innerHTML = log.map(l=>`<div style="font-size:12px;">${l}</div>`).join('') +
+        (noMatch.length ? `<div style="color:#ef4444;font-size:11px;margin-top:4px;">${noMatch.join('<br/>')}</div>` : '') + debugBtn;
       showToast(`✓ ${updated} resultados sincronizados`);
     } else {
-      // Build debug info
-      const debugInfo = matches.map(m => ({
-        home: m.home_team || m.home,
-        away: m.away_team || m.away,
-        status: m.phase || m.status || m.match_status || m.state,
-        home_score: m.home_score,
-        away_score: m.away_score,
-        finished: m.finished
-      }));
-      statusEl.innerHTML = `<span style="color:var(--muted);">Total partidos API: ${matches.length}</span>`;
-      logEl.innerHTML = `<div style="color:var(--muted);font-size:12px;">
-        <button onclick="document.getElementById('raw-log').style.display=document.getElementById('raw-log').style.display==='none'?'block':'none'" style="background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;">🔍 Ver datos API (${matches.length} partidos)</button>
-        <pre id="raw-log" style="display:none;font-size:10px;color:var(--text);margin-top:6px;overflow:auto;max-height:300px;white-space:pre-wrap;background:var(--surface2);padding:8px;border-radius:6px;">${JSON.stringify(matches.slice(0,3), null, 2)}</pre>
-      </div>`;
+      statusEl.innerHTML = `<span style="color:var(--muted);">Total API: ${matches.length} · Terminados: ${matches.filter(m=>m.status==='completed').length}</span>`;
+      logEl.innerHTML = `<div style="font-size:12px;color:var(--muted);">Sin cambios nuevos.</div>` +
+        (noMatch.length ? `<div style="color:#ef4444;font-size:11px;margin-top:4px;">${noMatch.slice(0,5).join('<br/>')}</div>` : '') + debugBtn;
     }
 
   } catch (err) {
