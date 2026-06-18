@@ -557,10 +557,28 @@ let state = {
 };
 
 function loadState() {
+  // Default data embedded - localStorage overrides if newer data exists
+  const defaultData = {"results":{"1":{"home":2,"away":0},"2":{"home":2,"away":1},"7":{"home":1,"away":1},"8":{"home":1,"away":1},"13":{"home":1,"away":1},"14":{"home":0,"away":1},"19":{"home":4,"away":1},"20":{"home":2,"away":0},"25":{"home":7,"away":1},"26":{"home":1,"away":0},"31":{"home":2,"away":2},"32":{"home":5,"away":1},"37":{"home":1,"away":1},"38":{"home":2,"away":2},"43":{"home":0,"away":0},"44":{"home":1,"away":1},"49":{"home":3,"away":1},"50":{"home":1,"away":4},"55":{"home":3,"away":0},"56":{"home":3,"away":1},"61":{"home":1,"away":1},"62":{"home":1,"away":3},"67":{"home":4,"away":2},"68":{"home":1,"away":0}},"predictions":{"Don Timba":{"1":{"home":2,"away":0},"2":{"home":1,"away":2},"3":{"home":1,"away":1},"4":{"home":2,"away":1},"7":{"home":2,"away":1},"8":{"home":0,"away":2},"9":{"home":2,"away":1},"10":{"home":2,"away":0},"13":{"home":2,"away":1},"14":{"home":0,"away":2},"19":{"home":1,"away":1},"20":{"home":1,"away":2},"25":{"home":4,"away":0},"26":{"home":1,"away":1},"31":{"home":2,"away":1},"32":{"home":1,"away":0},"37":{"home":2,"away":1},"38":{"home":2,"away":0},"43":{"home":2,"away":0},"44":{"home":1,"away":2},"49":{"home":1,"away":1},"50":{"home":0,"away":3},"55":{"home":2,"away":0},"56":{"home":2,"away":0},"61":{"home":4,"away":0},"62":{"home":0,"away":2},"67":{"home":1,"away":1},"68":{"home":2,"away":0}},"Sr. Godoy":{"1":{"home":2,"away":0},"2":{"home":1,"away":1},"7":{"home":2,"away":0},"8":{"home":0,"away":2},"13":{"home":3,"away":2},"14":{"home":1,"away":2},"19":{"home":2,"away":1},"20":{"home":1,"away":2},"25":{"home":3,"away":0},"26":{"home":1,"away":1},"31":{"home":2,"away":2},"32":{"home":2,"away":1},"37":{"home":3,"away":1},"38":{"home":2,"away":1},"43":{"home":4,"away":1},"44":{"home":1,"away":2},"49":{"home":2,"away":1},"50":{"home":1,"away":3},"55":{"home":2,"away":1},"56":{"home":2,"away":1},"61":{"home":2,"away":0},"62":{"home":0,"away":2},"67":{"home":2,"away":1},"68":{"home":1,"away":1}},"Andres Reina":{"1":{"home":2,"away":1},"2":{"home":1,"away":0},"7":{"home":2,"away":0},"8":{"home":0,"away":2},"13":{"home":2,"away":0},"14":{"home":0,"away":3},"19":{"home":2,"away":0},"20":{"home":1,"away":2},"25":{"home":6,"away":0},"26":{"home":0,"away":1},"31":{"home":2,"away":1},"32":{"home":2,"away":0},"37":{"home":2,"away":1},"38":{"home":1,"away":0},"43":{"home":3,"away":0},"44":{"home":0,"away":1},"49":{"home":2,"away":0},"50":{"home":0,"away":3},"55":{"home":3,"away":1},"56":{"home":2,"away":0},"61":{"home":2,"away":0},"62":{"home":1,"away":3},"67":{"home":2,"away":1},"68":{"home":1,"away":2}},"John Triviño":{"1":{"home":2,"away":1},"2":{"home":2,"away":1},"7":{"home":3,"away":1},"8":{"home":0,"away":3},"13":{"home":2,"away":1},"14":{"home":1,"away":3},"19":{"home":1,"away":2},"20":{"home":1,"away":2},"25":{"home":4,"away":0},"26":{"home":2,"away":2},"31":{"home":2,"away":1},"32":{"home":2,"away":1},"37":{"home":2,"away":1},"38":{"home":2,"away":1},"43":{"home":3,"away":1},"44":{"home":1,"away":2},"49":{"home":2,"away":1},"50":{"home":0,"away":3},"55":{"home":2,"away":1},"56":{"home":2,"away":0},"61":{"home":3,"away":1},"62":{"home":1,"away":3},"67":{"home":2,"away":1},"68":{"home":2,"away":1}},"Carlos Toro":{"1":{"home":2,"away":1},"2":{"home":1,"away":1},"7":{"home":2,"away":1},"8":{"home":0,"away":2},"13":{"home":2,"away":1},"14":{"home":0,"away":3},"19":{"home":2,"away":1},"20":{"home":0,"away":2},"25":{"home":3,"away":0},"26":{"home":1,"away":2},"31":{"home":1,"away":2},"32":{"home":0,"away":0},"37":{"home":3,"away":1},"38":{"home":1,"away":2},"43":{"home":5,"away":0},"44":{"home":1,"away":3},"49":{"home":2,"away":1},"50":{"home":1,"away":2},"55":{"home":3,"away":0},"56":{"home":0,"away":0},"61":{"home":2,"away":0},"62":{"home":1,"away":2},"67":{"home":2,"away":1},"68":{"home":1,"away":2}},"Nono":{"1":{"home":2,"away":0},"2":{"home":1,"away":2},"3":{"home":2,"away":0},"4":{"home":1,"away":2},"7":{"home":1,"away":2},"8":{"home":0,"away":3},"9":{"home":2,"away":1},"10":{"home":2,"away":0},"13":{"home":2,"away":2},"14":{"home":0,"away":2},"19":{"home":1,"away":1},"20":{"home":1,"away":2},"25":{"home":4,"away":0},"26":{"home":1,"away":2},"31":{"home":2,"away":2},"32":{"home":1,"away":1},"37":{"home":2,"away":0},"38":{"home":1,"away":2},"43":{"home":6,"away":0},"44":{"home":1,"away":3},"49":{"home":3,"away":1},"50":{"home":0,"away":2},"55":{"home":2,"away":1},"56":{"home":1,"away":0},"61":{"home":2,"away":1},"62":{"home":0,"away":2},"67":{"home":1,"away":1},"68":{"home":2,"away":0}},"DJ Asesor":{"1":{"home":1,"away":0},"2":{"away":1,"home":0},"7":{"home":3,"away":1},"8":{"home":1,"away":3},"13":{"home":4,"away":2},"14":{"home":0,"away":4},"19":{"home":2,"away":1},"20":{"home":1,"away":3},"25":{"home":5,"away":0},"26":{"home":1,"away":2},"31":{"home":2,"away":1},"32":{"home":1,"away":1},"37":{"home":3,"away":1},"38":{"home":2,"away":1},"43":{"home":5,"away":0},"44":{"home":1,"away":1},"49":{"home":4,"away":1},"50":{"home":1,"away":3},"55":{"home":3,"away":0},"56":{"home":2,"away":1},"61":{"home":3,"away":1},"62":{"home":1,"away":4},"67":{"home":3,"away":1},"68":{"home":2,"away":1}},"Mauricio Diaz":{"1":{"home":1,"away":0},"2":{"home":1,"away":1},"7":{"home":1,"away":0},"8":{"home":0,"away":3},"13":{"home":2,"away":1},"14":{"home":0,"away":3},"19":{"home":1,"away":1},"20":{"home":1,"away":2},"25":{"home":3,"away":0},"26":{"home":1,"away":2},"31":{"home":3,"away":1},"32":{"home":3,"away":1},"37":{"home":1,"away":1},"38":{"home":2,"away":2},"43":{"home":2,"away":1},"44":{"home":2,"away":1},"49":{"home":2,"away":1},"50":{"home":2,"away":2},"55":{"home":1,"away":0},"56":{"home":2,"away":0},"61":{"home":3,"away":1},"62":{"home":1,"away":1},"67":{"home":2,"away":2},"68":{"home":3,"away":1}}}};
   try {
     const s = localStorage.getItem('polla2026');
-    if (s) { const d = JSON.parse(s); state.results = d.results||{}; state.predictions = d.predictions||{}; state.locked = d.locked||{}; }
+    if (s) {
+      const d = JSON.parse(s);
+      // Use localStorage if it has more results (more recent)
+      const lsResultCount = Object.keys(d.results||{}).length;
+      const defResultCount = Object.keys(defaultData.results||{}).length;
+      if (lsResultCount >= defResultCount) {
+        state.results = d.results||{};
+        state.predictions = d.predictions||{};
+        state.locked = d.locked||{};
+        return;
+      }
+    }
   } catch(e) {}
+  // Use embedded defaults
+  state.results = defaultData.results||{};
+  state.predictions = defaultData.predictions||{};
+  state.locked = {};
+  saveState();
 }
 function saveState() {
   localStorage.setItem('polla2026', JSON.stringify({results: state.results, predictions: state.predictions, locked: state.locked}));
@@ -997,14 +1015,13 @@ function renderPredictions() {
       else if (pts === 0) ptsHtml = '<span class="pts-badge zero">0 pts</span>';
     }
 
-    const disabledAttr = isMatchLocked ? 'disabled' : '';
-    const inputStyle = isMatchLocked ? 'style="cursor:not-allowed;background:#fff;color:#111;font-weight:800;border:2px solid var(--green);"' : '';
+    const inputStyle = isMatchLocked ? 'style="background:#fff;color:#111;font-weight:800;border:2px solid var(--green);"' : '';
 
     return `<div class="pred-match-card" id="pred-card-${m.id}" style="${isMatchLocked ? 'border-left:3px solid var(--green);' : ''}">
       <div class="pred-match-header">
         <div style="font-size:12px;color:var(--muted);">P${m.id} · ${m.date} · ${m.time||''} · ${m.phase==='groups'?'Grupo '+m.group:m.group}</div>
         <div style="display:flex;gap:6px;align-items:center;">
-          ${isMatchLocked ? '<span style="font-size:11px;color:var(--green);font-weight:700;">🔒 Guardado</span>' : ''}
+          ${isMatchLocked ? '<span style="font-size:11px;color:var(--green);font-weight:700;">✓ Guardado</span>' : ''}
           ${ptsHtml}
         </div>
       </div>
@@ -1013,18 +1030,18 @@ function renderPredictions() {
           <span style="font-size:24px;">${flagH}</span>
           <span style="font-size:15px;font-weight:600;flex:1;">${m.home}</span>
           <input class="pred-input" type="number" min="0" max="20" value="${pred.home??''}" placeholder="-"
-            ${disabledAttr} ${inputStyle}
-            ${isMatchLocked ? '' : `oninput="savePred('${player}',${m.id},'home',this.value)"`} />
+            ${inputStyle}
+            oninput="savePred('${player}',${m.id},'home',this.value)" />
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:24px;">${flagA}</span>
           <span style="font-size:15px;font-weight:600;flex:1;">${m.away}</span>
           <input class="pred-input" type="number" min="0" max="20" value="${pred.away??''}" placeholder="-"
-            ${disabledAttr} ${inputStyle}
-            ${isMatchLocked ? '' : `oninput="savePred('${player}',${m.id},'away',this.value)"`} />
+            ${inputStyle}
+            oninput="savePred('${player}',${m.id},'away',this.value)" />
         </div>
         ${result ? `<div style="font-size:11px;color:var(--muted);text-align:right;">Resultado real: ${result.home}-${result.away}</div>` : ''}
-        ${!isMatchLocked && hasAnyValue
+        ${hasAnyValue
           ? `<button id="save-btn-${m.id}" class="btn btn-primary" style="width:100%;margin-top:4px;" onclick="lockMatch('${player}',${m.id})">🔒 Guardar pronóstico</button>`
           : ''}
       </div>
@@ -1041,7 +1058,6 @@ function lockMatch(player, matchId) {
 }
 
 function savePred(player, matchId, side, val) {
-  if (state.locked[player]?.[matchId]) return;
   if (!state.predictions[player]) state.predictions[player] = {};
   if (!state.predictions[player][matchId]) state.predictions[player][matchId] = {};
   state.predictions[player][matchId][side] = val === '' ? '' : parseInt(val);
@@ -1146,12 +1162,21 @@ function renderAdmin() {
     </div>`;
   }).join('');
 
+  // Sort matches: finished first (by id), then upcoming by id
+  const sorted = [...MATCHES_DATA].sort((a, b) => {
+    const aHas = state.results[a.id] ? 1 : 0;
+    const bHas = state.results[b.id] ? 1 : 0;
+    if (aHas !== bHas) return bHas - aHas; // finished first
+    return a.id - b.id; // then by match number
+  });
+
   const container = document.getElementById('results-list');
-  container.innerHTML = MATCHES_DATA.map(m => {
+  container.innerHTML = sorted.map(m => {
     const r = state.results[m.id] || {};
     const flagH = FLAGS[m.home] || '🏳️';
     const flagA = FLAGS[m.away] || '🏳️';
-    return `<div class="result-match-card">
+    const hasResult = r.home !== undefined && r.away !== undefined;
+    return `<div class="result-match-card" style="${hasResult ? 'border-left:3px solid var(--green);' : ''}">
       <div class="result-date">P${m.id} · ${m.date}</div>
       <div class="result-teams">${flagH} ${m.home}</div>
       <div class="score-inputs">
@@ -1162,7 +1187,7 @@ function renderAdmin() {
           onchange="updateResult(${m.id},'away',this.value)" />
       </div>
       <div class="result-teams">${m.away} ${flagA}</div>
-      ${r.home!==undefined ? '<span style="color:var(--green);font-size:12px;">✓</span>' : ''}
+      ${hasResult ? '<span style="color:var(--green);font-size:12px;">✓</span>' : ''}
     </div>`;
   }).join('');
 }
