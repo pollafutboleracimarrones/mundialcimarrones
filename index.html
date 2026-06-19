@@ -1488,9 +1488,14 @@ function importData(event) {
       const d = JSON.parse(e.target.result);
       state.results = d.results || {};
       state.predictions = d.predictions || {};
+      state.locked = d.locked || state.locked || {};
+      localStorage.setItem('polla2026_version', 'v2-jornada-renumbered');
       saveState();
       showToast('Datos importados ✓');
       renderStandings();
+      renderMatches();
+      renderGrupos();
+      renderAdmin();
     } catch(err) { showToast('Error al importar', true); }
   };
   reader.readAsText(file);
