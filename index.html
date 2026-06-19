@@ -1080,13 +1080,14 @@ function renderPredictions() {
       else if (pts === 0) ptsHtml = '<span class="pts-badge zero">0 pts</span>';
     }
 
-    const inputStyle = isMatchLocked ? 'style="background:#fff;color:#111;font-weight:800;border:2px solid var(--green);"' : '';
+    const inputStyle = isMatchLocked ? 'style="cursor:not-allowed;background:#fff;color:#111;font-weight:800;border:2px solid var(--green);"' : '';
+    const disabledAttr = isMatchLocked ? 'disabled' : '';
 
     return `<div class="pred-match-card" id="pred-card-${m.id}" style="${isMatchLocked ? 'border-left:3px solid var(--green);' : ''}">
       <div class="pred-match-header">
         <div style="font-size:12px;color:var(--muted);">P${m.id} · ${m.date} · ${m.time||''} · ${m.phase==='groups'?'Grupo '+m.group:m.group}</div>
         <div style="display:flex;gap:6px;align-items:center;">
-          ${isMatchLocked ? '<span style="font-size:11px;color:var(--green);font-weight:700;">✓ Guardado</span>' : ''}
+          ${isMatchLocked ? '<span style="font-size:11px;color:var(--green);font-weight:700;">🔒 Guardado</span>' : ''}
           ${ptsHtml}
         </div>
       </div>
@@ -1095,18 +1096,18 @@ function renderPredictions() {
           <span style="font-size:24px;">${flagH}</span>
           <span style="font-size:15px;font-weight:600;flex:1;">${m.home}</span>
           <input class="pred-input" type="number" min="0" max="20" value="${pred.home??''}" placeholder="-"
-            ${inputStyle}
-            oninput="savePred('${player}',${m.id},'home',this.value)" />
+            ${inputStyle} ${disabledAttr}
+            ${isMatchLocked ? '' : `oninput="savePred('${player}',${m.id},'home',this.value)"`} />
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:24px;">${flagA}</span>
           <span style="font-size:15px;font-weight:600;flex:1;">${m.away}</span>
           <input class="pred-input" type="number" min="0" max="20" value="${pred.away??''}" placeholder="-"
-            ${inputStyle}
-            oninput="savePred('${player}',${m.id},'away',this.value)" />
+            ${inputStyle} ${disabledAttr}
+            ${isMatchLocked ? '' : `oninput="savePred('${player}',${m.id},'away',this.value)"`} />
         </div>
         ${result ? `<div style="font-size:11px;color:var(--muted);text-align:right;">Resultado real: ${result.home}-${result.away}</div>` : ''}
-        ${hasAnyValue
+        ${!isMatchLocked && hasAnyValue
           ? `<button id="save-btn-${m.id}" class="btn btn-primary" style="width:100%;margin-top:4px;" onclick="lockMatch('${player}',${m.id})">🔒 Guardar pronóstico</button>`
           : ''}
       </div>
@@ -1123,6 +1124,7 @@ function lockMatch(player, matchId) {
 }
 
 function savePred(player, matchId, side, val) {
+  if (state.locked[player]?.[matchId]) return;
   if (!state.predictions[player]) state.predictions[player] = {};
   if (!state.predictions[player][matchId]) state.predictions[player][matchId] = {};
   state.predictions[player][matchId][side] = val === '' ? '' : parseInt(val);
@@ -1330,7 +1332,7 @@ async function syncResults() {
     console.log('API raw response type:', Array.isArray(data) ? 'array' : typeof data);
     console.log('API first item:', JSON.stringify(Array.isArray(data) ? data[0] : data, null, 2));
     const matches = Array.isArray(data) ? data : (data.matches || data.data || data.results || []);
-    let updated = 0, log = [], noMatch = [];
+    let updated = 0, log = [], noMatch = [], checked = 0;
 
     // Mapa inglés → español para nombres de equipos de la API
     const TEAM_MAP = {
@@ -1410,6 +1412,9 @@ async function syncResults() {
       return TEAM_MAP[lower] || apiName;
     }
 
+    // Find IDs of matches that still need a result (skip already-confirmed ones)
+    const pendingIds = new Set(MATCHES_DATA.filter(m => !state.results[m.id]).map(m => m.id));
+
     matches.forEach(apiMatch => {
       const statusVal = (apiMatch.status || '').toLowerCase();
       const isFinished = statusVal === 'completed' || statusVal === 'ft' || statusVal === 'ft_pen';
@@ -1425,24 +1430,20 @@ async function syncResults() {
       if (homeScore == null || awayScore == null) return;
 
       const ourMatch = MATCHES_DATA.find(m => {
+        if (!pendingIds.has(m.id)) return false; // skip matches we already have confirmed
         const h = normalize(m.home);
         const a = normalize(m.away);
         return h === homeTeam && a === awayTeam;
       });
 
       if (ourMatch) {
-        const existing = state.results[ourMatch.id];
-        if (!existing || existing.home !== homeScore || existing.away !== awayScore) {
-          state.results[ourMatch.id] = { home: homeScore, away: awayScore };
-          updated++;
-          log.push(`✓ P${ourMatch.id} ${ourMatch.home} ${homeScore}-${awayScore} ${ourMatch.away}`);
-        } else {
-          log.push(`= P${ourMatch.id} ${ourMatch.home} ${homeScore}-${awayScore} ${ourMatch.away} (sin cambio)`);
-        }
-      } else {
-        noMatch.push(`❓ "${rawHome}" vs "${rawAway}" → traducido: "${homeTeam}" vs "${awayTeam}"`);
+        state.results[ourMatch.id] = { home: homeScore, away: awayScore };
+        updated++;
+        log.push(`✓ P${ourMatch.id} ${ourMatch.home} ${homeScore}-${awayScore} ${ourMatch.away}`);
       }
     });
+
+    checked = matches.filter(m => (m.status||'').toLowerCase()==='completed'||(m.status||'').toLowerCase()==='ft').length;
 
     const debugBtn = `<button onclick="document.getElementById('raw-log').style.display=document.getElementById('raw-log').style.display==='none'?'block':'none'" style="background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;margin-top:8px;">🔍 Ver datos API</button>
       <pre id="raw-log" style="display:none;font-size:10px;color:var(--text);margin-top:6px;overflow:auto;max-height:250px;white-space:pre-wrap;background:var(--surface2);padding:8px;border-radius:6px;">${JSON.stringify(matches.filter(m=>m.status==='completed').slice(0,5), null, 2)}</pre>`;
@@ -1454,9 +1455,9 @@ async function syncResults() {
         (noMatch.length ? `<div style="color:#ef4444;font-size:11px;margin-top:4px;">${noMatch.join('<br/>')}</div>` : '') + debugBtn;
       showToast(`✓ ${updated} resultados sincronizados`);
     } else {
-      statusEl.innerHTML = `<span style="color:var(--muted);">Total API: ${matches.length} · Terminados: ${matches.filter(m=>m.status==='completed').length}</span>`;
-      logEl.innerHTML = `<div style="font-size:12px;color:var(--muted);">Sin cambios nuevos.</div>` +
-        (noMatch.length ? `<div style="color:#ef4444;font-size:11px;margin-top:4px;">${noMatch.slice(0,5).join('<br/>')}</div>` : '') + debugBtn;
+      const pendingCount = MATCHES_DATA.filter(m => !state.results[m.id]).length;
+      statusEl.innerHTML = `<span style="color:var(--muted);">✓ Sin novedades · ${pendingCount} partido(s) pendientes por jugar</span>`;
+      logEl.innerHTML = (noMatch.length ? `<div style="color:#ef4444;font-size:11px;">${noMatch.slice(0,5).join('<br/>')}</div>` : '') + debugBtn;
     }
 
   } catch (err) {
