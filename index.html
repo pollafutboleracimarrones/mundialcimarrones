@@ -406,139 +406,165 @@ const GROUPS = {
 
 const MATCHES_DATA = [
   // GRUPO A
-  {id:1, date:'Jun 11', time:'2:00pm',  home:'México',              away:'Sudáfrica',          group:'A', phase:'groups'},
-  {id:2, date:'Jun 11', time:'9:00pm',  home:'Corea del Sur',       away:'Rep. Checa',         group:'A', phase:'groups'},
-  {id:3, date:'Jun 18', time:'11:00am', home:'Rep. Checa',          away:'Sudáfrica',          group:'A', phase:'groups'},
-  {id:4, date:'Jun 18', time:'8:00pm',  home:'México',              away:'Corea del Sur',      group:'A', phase:'groups'},
+  {id:1, date:'Jun 11', time:'2:00pm', home:'México', away:'Sudáfrica', group:'A', phase:'groups'},
+  {id:2, date:'Jun 11', time:'9:00pm', home:'Corea del Sur', away:'Rep. Checa', group:'A', phase:'groups'},
   // GRUPO B
-  {id:7, date:'Jun 12', time:'2:00pm',  home:'Canadá',              away:'Bosnia y Herzegovina',     group:'B', phase:'groups'},
-  {id:8, date:'Jun 13', time:'1:00pm',  home:'Qatar',               away:'Suiza',              group:'B', phase:'groups'},
-  {id:9, date:'Jun 18', time:'2:00pm',  home:'Suiza',               away:'Bosnia y Herzegovina',     group:'B', phase:'groups'},
-  {id:10, date:'Jun 18', time:'5:00pm',  home:'Canadá',              away:'Qatar',              group:'B', phase:'groups'},
-  // GRUPO C
-  {id:13, date:'Jun 13', time:'4:00pm',  home:'Brasil',              away:'Marruecos',          group:'C', phase:'groups'},
-  {id:14, date:'Jun 13', time:'7:00pm',  home:'Haití',               away:'Escocia',            group:'C', phase:'groups'},
-  {id:15, date:'Jun 19', time:'5:00pm',  home:'Escocia',             away:'Marruecos',          group:'C', phase:'groups'},
-  {id:16, date:'Jun 19', time:'7:30pm',  home:'Brasil',              away:'Haití',              group:'C', phase:'groups'},
+  {id:3, date:'Jun 12', time:'2:00pm', home:'Canadá', away:'Bosnia y Herzegovina', group:'B', phase:'groups'},
   // GRUPO D
-  {id:19, date:'Jun 12', time:'7:00pm',  home:'Estados Unidos',      away:'Paraguay',           group:'D', phase:'groups'},
-  {id:20, date:'Jun 13', time:'11:00pm', home:'Australia',           away:'Turquía',            group:'D', phase:'groups'},
-  {id:21, date:'Jun 19', time:'2:00pm',  home:'Estados Unidos',      away:'Australia',          group:'D', phase:'groups'},
-  {id:22, date:'Jun 19', time:'10:00pm', home:'Turquía',             away:'Paraguay',           group:'D', phase:'groups'},
+  {id:4, date:'Jun 12', time:'7:00pm', home:'Estados Unidos', away:'Paraguay', group:'D', phase:'groups'},
+  // GRUPO B
+  {id:5, date:'Jun 13', time:'1:00pm', home:'Qatar', away:'Suiza', group:'B', phase:'groups'},
+  // GRUPO C
+  {id:6, date:'Jun 13', time:'4:00pm', home:'Brasil', away:'Marruecos', group:'C', phase:'groups'},
+  {id:7, date:'Jun 13', time:'7:00pm', home:'Haití', away:'Escocia', group:'C', phase:'groups'},
+  // GRUPO D
+  {id:8, date:'Jun 13', time:'11:00pm', home:'Australia', away:'Turquía', group:'D', phase:'groups'},
   // GRUPO E
-  {id:25, date:'Jun 14', time:'12:00pm', home:'Alemania',            away:'Curazao',            group:'E', phase:'groups'},
-  {id:26, date:'Jun 14', time:'6:00pm',  home:'Costa de Marfil',     away:'Ecuador',            group:'E', phase:'groups'},
-  {id:27, date:'Jun 20', time:'3:00pm', home:'Alemania',            away:'Costa de Marfil',    group:'E', phase:'groups'},
-  {id:28, date:'Jun 20', time:'9:00pm',  home:'Ecuador',             away:'Curazao',            group:'E', phase:'groups'},
+  {id:9, date:'Jun 14', time:'12:00pm', home:'Alemania', away:'Curazao', group:'E', phase:'groups'},
   // GRUPO F
-  {id:31, date:'Jun 14', time:'3:00pm',  home:'Países Bajos',        away:'Japón',              group:'F', phase:'groups'},
-  {id:32, date:'Jun 14', time:'9:00pm',  home:'Suecia',              away:'Túnez',              group:'F', phase:'groups'},
-  {id:33, date:'Jun 20', time:'12:00pm',  home:'Países Bajos',        away:'Suecia',             group:'F', phase:'groups'},
-  {id:34, date:'Jun 20', time:'11:00pm',  home:'Túnez',               away:'Japón',              group:'F', phase:'groups'},
-  // GRUPO G
-  {id:37, date:'Jun 15', time:'2:00pm',  home:'Bélgica',             away:'Egipto',             group:'G', phase:'groups'},
-  {id:38, date:'Jun 15', time:'8:00pm',  home:'Irán',                away:'Nueva Zelanda',      group:'G', phase:'groups'},
-  {id:39, date:'Jun 21', time:'2:00pm',  home:'Bélgica',             away:'Irán',               group:'G', phase:'groups'},
-  {id:40, date:'Jun 21', time:'8:00pm',  home:'Nueva Zelanda',       away:'Egipto',             group:'G', phase:'groups'},
+  {id:10, date:'Jun 14', time:'3:00pm', home:'Países Bajos', away:'Japón', group:'F', phase:'groups'},
+  // GRUPO E
+  {id:11, date:'Jun 14', time:'6:00pm', home:'Costa de Marfil', away:'Ecuador', group:'E', phase:'groups'},
+  // GRUPO F
+  {id:12, date:'Jun 14', time:'9:00pm', home:'Suecia', away:'Túnez', group:'F', phase:'groups'},
   // GRUPO H
-  {id:43, date:'Jun 15', time:'11:00am', home:'España',              away:'Cabo Verde',         group:'H', phase:'groups'},
-  {id:44, date:'Jun 15', time:'5:00pm',  home:'Arabia Saudita',      away:'Uruguay',            group:'H', phase:'groups'},
-  {id:45, date:'Jun 21', time:'11:00am', home:'España',              away:'Arabia Saudita',     group:'H', phase:'groups'},
-  {id:46, date:'Jun 21', time:'5:00pm',  home:'Uruguay',             away:'Cabo Verde',         group:'H', phase:'groups'},
+  {id:13, date:'Jun 15', time:'11:00am', home:'España', away:'Cabo Verde', group:'H', phase:'groups'},
+  // GRUPO G
+  {id:14, date:'Jun 15', time:'2:00pm', home:'Bélgica', away:'Egipto', group:'G', phase:'groups'},
+  // GRUPO H
+  {id:15, date:'Jun 15', time:'5:00pm', home:'Arabia Saudita', away:'Uruguay', group:'H', phase:'groups'},
+  // GRUPO G
+  {id:16, date:'Jun 15', time:'8:00pm', home:'Irán', away:'Nueva Zelanda', group:'G', phase:'groups'},
   // GRUPO I
-  {id:49, date:'Jun 16', time:'2:00pm', home:'Francia',             away:'Senegal',            group:'I', phase:'groups'},
-  {id:50, date:'Jun 16', time:'5:00pm',  home:'Irak',                away:'Noruega',            group:'I', phase:'groups'},
-  {id:51, date:'Jun 22', time:'4:00pm', home:'Francia',             away:'Irak',               group:'I', phase:'groups'},
-  {id:52, date:'Jun 22', time:'7:00pm',  home:'Noruega',             away:'Senegal',            group:'I', phase:'groups'},
+  {id:17, date:'Jun 16', time:'2:00pm', home:'Francia', away:'Senegal', group:'I', phase:'groups'},
+  {id:18, date:'Jun 16', time:'5:00pm', home:'Irak', away:'Noruega', group:'I', phase:'groups'},
   // GRUPO J
-  {id:55, date:'Jun 16', time:'8:00pm',  home:'Argentina',           away:'Argelia',            group:'J', phase:'groups'},
-  {id:56, date:'Jun 16', time:'11:00pm',  home:'Austria',             away:'Jordania',           group:'J', phase:'groups'},
-  {id:57, date:'Jun 22', time:'12:00pm',  home:'Argentina',           away:'Austria',            group:'J', phase:'groups'},
-  {id:58, date:'Jun 22', time:'10:00pm',  home:'Jordania',            away:'Argelia',            group:'J', phase:'groups'},
+  {id:19, date:'Jun 16', time:'8:00pm', home:'Argentina', away:'Argelia', group:'J', phase:'groups'},
+  {id:20, date:'Jun 16', time:'11:00pm', home:'Austria', away:'Jordania', group:'J', phase:'groups'},
   // GRUPO K
-  {id:61, date:'Jun 17', time:'12:00pm', home:'Portugal',            away:'RD de Congo',        group:'K', phase:'groups'},
-  {id:62, date:'Jun 17', time:'9:00pm',  home:'Uzbekistán',          away:'Colombia',           group:'K', phase:'groups'},
-  {id:63, date:'Jun 23', time:'12:00pm',  home:'Portugal',            away:'Uzbekistán',         group:'K', phase:'groups'},
-  {id:64, date:'Jun 23', time:'9:00pm',  home:'Colombia',            away:'RD de Congo',        group:'K', phase:'groups'},
+  {id:21, date:'Jun 17', time:'12:00pm', home:'Portugal', away:'RD de Congo', group:'K', phase:'groups'},
   // GRUPO L
-  {id:67, date:'Jun 17', time:'3:00pm',  home:'Inglaterra',          away:'Croacia',            group:'L', phase:'groups'},
-  {id:68, date:'Jun 17', time:'6:00pm',  home:'Ghana',               away:'Panamá',             group:'L', phase:'groups'},
-  {id:69, date:'Jun 23', time:'3:00pm', home:'Inglaterra',          away:'Ghana',              group:'L', phase:'groups'},
-  {id:70, date:'Jun 23', time:'6:00pm',  home:'Panamá',              away:'Croacia',            group:'L', phase:'groups'},
-  // JORNADA 3 - GRUPO A
-  {id:5,  date:'Jun 24', time:'2:00pm',  home:'Sudáfrica',           away:'Corea del Sur',      group:'A', phase:'groups'},
-  {id:6,  date:'Jun 24', time:'2:00pm',  home:'Rep. Checa',          away:'México',             group:'A', phase:'groups'},
-  // JORNADA 3 - GRUPO B
-  {id:11, date:'Jun 24', time:'5:00pm',  home:'Suiza',               away:'Canadá',             group:'B', phase:'groups'},
-  {id:12, date:'Jun 24', time:'5:00pm',  home:'Bosnia y Herzegovina',away:'Qatar',              group:'B', phase:'groups'},
-  // JORNADA 3 - GRUPO C
-  {id:17, date:'Jun 24', time:'8:00pm',  home:'Marruecos',           away:'Haití',              group:'C', phase:'groups'},
-  {id:18, date:'Jun 24', time:'8:00pm',  home:'Brasil',              away:'Escocia',            group:'C', phase:'groups'},
-  // JORNADA 3 - GRUPO D
-  {id:23, date:'Jun 25', time:'2:00pm',  home:'Paraguay',            away:'Australia',          group:'D', phase:'groups'},
-  {id:24, date:'Jun 25', time:'2:00pm',  home:'Turquía',             away:'Estados Unidos',     group:'D', phase:'groups'},
-  // JORNADA 3 - GRUPO E
-  {id:29, date:'Jun 25', time:'5:00pm',  home:'Curazao',             away:'Costa de Marfil',   group:'E', phase:'groups'},
-  {id:30, date:'Jun 25', time:'5:00pm',  home:'Ecuador',             away:'Alemania',           group:'E', phase:'groups'},
-  // JORNADA 3 - GRUPO F
-  {id:35, date:'Jun 25', time:'8:00pm',  home:'Japón',               away:'Suecia',             group:'F', phase:'groups'},
-  {id:36, date:'Jun 25', time:'8:00pm',  home:'Túnez',               away:'Países Bajos',      group:'F', phase:'groups'},
-  // JORNADA 3 - GRUPO G
-  {id:41, date:'Jun 26', time:'2:00pm',  home:'Egipto',              away:'Irán',               group:'G', phase:'groups'},
-  {id:42, date:'Jun 26', time:'2:00pm',  home:'Nueva Zelanda',       away:'Bélgica',            group:'G', phase:'groups'},
-  // JORNADA 3 - GRUPO H
-  {id:47, date:'Jun 26', time:'5:00pm',  home:'Cabo Verde',          away:'Arabia Saudita',    group:'H', phase:'groups'},
-  {id:48, date:'Jun 26', time:'5:00pm',  home:'Uruguay',             away:'España',             group:'H', phase:'groups'},
-  // JORNADA 3 - GRUPO I
-  {id:53, date:'Jun 26', time:'8:00pm',  home:'Noruega',             away:'Francia',            group:'I', phase:'groups'},
-  {id:54, date:'Jun 26', time:'8:00pm',  home:'Senegal',             away:'Irak',               group:'I', phase:'groups'},
-  // JORNADA 3 - GRUPO J
-  {id:59, date:'Jun 27', time:'2:00pm',  home:'Argelia',             away:'Austria',            group:'J', phase:'groups'},
-  {id:60, date:'Jun 27', time:'2:00pm',  home:'Jordania',            away:'Argentina',          group:'J', phase:'groups'},
-  // JORNADA 3 - GRUPO K
-  {id:65, date:'Jun 27', time:'5:00pm',  home:'Colombia',            away:'Portugal',           group:'K', phase:'groups'},
-  {id:66, date:'Jun 27', time:'5:00pm',  home:'RD de Congo',         away:'Uzbekistán',        group:'K', phase:'groups'},
-  // JORNADA 3 - GRUPO L
-  {id:71, date:'Jun 27', time:'8:00pm',  home:'Croacia',             away:'Ghana',              group:'L', phase:'groups'},
-  {id:72, date:'Jun 27', time:'8:00pm',  home:'Panamá',              away:'Inglaterra',         group:'L', phase:'groups'},
+  {id:22, date:'Jun 17', time:'3:00pm', home:'Inglaterra', away:'Croacia', group:'L', phase:'groups'},
+  {id:23, date:'Jun 17', time:'6:00pm', home:'Ghana', away:'Panamá', group:'L', phase:'groups'},
+  // GRUPO K
+  {id:24, date:'Jun 17', time:'9:00pm', home:'Uzbekistán', away:'Colombia', group:'K', phase:'groups'},
+  // GRUPO A
+  {id:25, date:'Jun 18', time:'11:00am', home:'Rep. Checa', away:'Sudáfrica', group:'A', phase:'groups'},
+  // GRUPO B
+  {id:26, date:'Jun 18', time:'2:00pm', home:'Suiza', away:'Bosnia y Herzegovina', group:'B', phase:'groups'},
+  {id:27, date:'Jun 18', time:'5:00pm', home:'Canadá', away:'Qatar', group:'B', phase:'groups'},
+  // GRUPO A
+  {id:28, date:'Jun 18', time:'8:00pm', home:'México', away:'Corea del Sur', group:'A', phase:'groups'},
+  // GRUPO D
+  {id:29, date:'Jun 19', time:'2:00pm', home:'Estados Unidos', away:'Australia', group:'D', phase:'groups'},
+  // GRUPO C
+  {id:30, date:'Jun 19', time:'5:00pm', home:'Escocia', away:'Marruecos', group:'C', phase:'groups'},
+  {id:31, date:'Jun 19', time:'7:30pm', home:'Brasil', away:'Haití', group:'C', phase:'groups'},
+  // GRUPO D
+  {id:32, date:'Jun 19', time:'10:00pm', home:'Turquía', away:'Paraguay', group:'D', phase:'groups'},
+  // GRUPO F
+  {id:33, date:'Jun 20', time:'12:00pm', home:'Países Bajos', away:'Suecia', group:'F', phase:'groups'},
+  // GRUPO E
+  {id:34, date:'Jun 20', time:'3:00pm', home:'Alemania', away:'Costa de Marfil', group:'E', phase:'groups'},
+  {id:35, date:'Jun 20', time:'9:00pm', home:'Ecuador', away:'Curazao', group:'E', phase:'groups'},
+  // GRUPO F
+  {id:36, date:'Jun 20', time:'11:00pm', home:'Túnez', away:'Japón', group:'F', phase:'groups'},
+  // GRUPO H
+  {id:37, date:'Jun 21', time:'11:00am', home:'España', away:'Arabia Saudita', group:'H', phase:'groups'},
+  // GRUPO G
+  {id:38, date:'Jun 21', time:'2:00pm', home:'Bélgica', away:'Irán', group:'G', phase:'groups'},
+  // GRUPO H
+  {id:39, date:'Jun 21', time:'5:00pm', home:'Uruguay', away:'Cabo Verde', group:'H', phase:'groups'},
+  // GRUPO G
+  {id:40, date:'Jun 21', time:'8:00pm', home:'Nueva Zelanda', away:'Egipto', group:'G', phase:'groups'},
+  // GRUPO J
+  {id:41, date:'Jun 22', time:'12:00pm', home:'Argentina', away:'Austria', group:'J', phase:'groups'},
+  // GRUPO I
+  {id:42, date:'Jun 22', time:'4:00pm', home:'Francia', away:'Irak', group:'I', phase:'groups'},
+  {id:43, date:'Jun 22', time:'7:00pm', home:'Noruega', away:'Senegal', group:'I', phase:'groups'},
+  // GRUPO J
+  {id:44, date:'Jun 22', time:'10:00pm', home:'Jordania', away:'Argelia', group:'J', phase:'groups'},
+  // GRUPO K
+  {id:45, date:'Jun 23', time:'12:00pm', home:'Portugal', away:'Uzbekistán', group:'K', phase:'groups'},
+  // GRUPO L
+  {id:46, date:'Jun 23', time:'3:00pm', home:'Inglaterra', away:'Ghana', group:'L', phase:'groups'},
+  {id:47, date:'Jun 23', time:'6:00pm', home:'Panamá', away:'Croacia', group:'L', phase:'groups'},
+  // GRUPO K
+  {id:48, date:'Jun 23', time:'9:00pm', home:'Colombia', away:'RD de Congo', group:'K', phase:'groups'},
+  // GRUPO A
+  {id:49, date:'Jun 24', time:'2:00pm', home:'Sudáfrica', away:'Corea del Sur', group:'A', phase:'groups'},
+  {id:50, date:'Jun 24', time:'2:00pm', home:'Rep. Checa', away:'México', group:'A', phase:'groups'},
+  // GRUPO B
+  {id:51, date:'Jun 24', time:'5:00pm', home:'Suiza', away:'Canadá', group:'B', phase:'groups'},
+  {id:52, date:'Jun 24', time:'5:00pm', home:'Bosnia y Herzegovina', away:'Qatar', group:'B', phase:'groups'},
+  // GRUPO C
+  {id:53, date:'Jun 24', time:'8:00pm', home:'Marruecos', away:'Haití', group:'C', phase:'groups'},
+  {id:54, date:'Jun 24', time:'8:00pm', home:'Brasil', away:'Escocia', group:'C', phase:'groups'},
+  // GRUPO D
+  {id:55, date:'Jun 25', time:'2:00pm', home:'Paraguay', away:'Australia', group:'D', phase:'groups'},
+  {id:56, date:'Jun 25', time:'2:00pm', home:'Turquía', away:'Estados Unidos', group:'D', phase:'groups'},
+  // GRUPO E
+  {id:57, date:'Jun 25', time:'5:00pm', home:'Curazao', away:'Costa de Marfil', group:'E', phase:'groups'},
+  {id:58, date:'Jun 25', time:'5:00pm', home:'Ecuador', away:'Alemania', group:'E', phase:'groups'},
+  // GRUPO F
+  {id:59, date:'Jun 25', time:'8:00pm', home:'Japón', away:'Suecia', group:'F', phase:'groups'},
+  {id:60, date:'Jun 25', time:'8:00pm', home:'Túnez', away:'Países Bajos', group:'F', phase:'groups'},
+  // GRUPO G
+  {id:61, date:'Jun 26', time:'2:00pm', home:'Egipto', away:'Irán', group:'G', phase:'groups'},
+  {id:62, date:'Jun 26', time:'2:00pm', home:'Nueva Zelanda', away:'Bélgica', group:'G', phase:'groups'},
+  // GRUPO H
+  {id:63, date:'Jun 26', time:'5:00pm', home:'Cabo Verde', away:'Arabia Saudita', group:'H', phase:'groups'},
+  {id:64, date:'Jun 26', time:'5:00pm', home:'Uruguay', away:'España', group:'H', phase:'groups'},
+  // GRUPO I
+  {id:65, date:'Jun 26', time:'8:00pm', home:'Noruega', away:'Francia', group:'I', phase:'groups'},
+  {id:66, date:'Jun 26', time:'8:00pm', home:'Senegal', away:'Irak', group:'I', phase:'groups'},
+  // GRUPO J
+  {id:67, date:'Jun 27', time:'2:00pm', home:'Argelia', away:'Austria', group:'J', phase:'groups'},
+  {id:68, date:'Jun 27', time:'2:00pm', home:'Jordania', away:'Argentina', group:'J', phase:'groups'},
+  // GRUPO K
+  {id:69, date:'Jun 27', time:'5:00pm', home:'Colombia', away:'Portugal', group:'K', phase:'groups'},
+  {id:70, date:'Jun 27', time:'5:00pm', home:'RD de Congo', away:'Uzbekistán', group:'K', phase:'groups'},
+  // GRUPO L
+  {id:71, date:'Jun 27', time:'8:00pm', home:'Croacia', away:'Ghana', group:'L', phase:'groups'},
+  {id:72, date:'Jun 27', time:'8:00pm', home:'Panamá', away:'Inglaterra', group:'L', phase:'groups'},
   // 16AVOS DE FINAL
-  {id:73, date:'Jun 28', time:'1:00pm',  home:'2º Grupo A',          away:'2º Grupo B',         group:'16avos', phase:'knockout'},
-  {id:74, date:'Jun 28', time:'4:00pm',  home:'1º Grupo C',          away:'3º mejor',           group:'16avos', phase:'knockout'},
-  {id:75, date:'Jun 28', time:'7:00pm',  home:'1º Grupo A',          away:'3º mejor',           group:'16avos', phase:'knockout'},
-  {id:76, date:'Jun 28', time:'10:00pm', home:'1º Grupo B',          away:'3º mejor',           group:'16avos', phase:'knockout'},
-  {id:77, date:'Jun 29', time:'1:00pm',  home:'1º Grupo F',          away:'2º Grupo E',         group:'16avos', phase:'knockout'},
-  {id:78, date:'Jun 29', time:'4:00pm',  home:'1º Grupo D',          away:'3º mejor',           group:'16avos', phase:'knockout'},
-  {id:79, date:'Jun 29', time:'7:00pm',  home:'2º Grupo C',          away:'2º Grupo D',         group:'16avos', phase:'knockout'},
-  {id:80, date:'Jun 29', time:'10:00pm', home:'1º Grupo E',          away:'3º mejor',           group:'16avos', phase:'knockout'},
-  {id:81, date:'Jun 30', time:'1:00pm',  home:'1º Grupo G',          away:'3º mejor',           group:'16avos', phase:'knockout'},
-  {id:82, date:'Jun 30', time:'4:00pm',  home:'2º Grupo F',          away:'2º Grupo G',         group:'16avos', phase:'knockout'},
-  {id:83, date:'Jun 30', time:'7:00pm',  home:'1º Grupo H',          away:'3º mejor',           group:'16avos', phase:'knockout'},
-  {id:84, date:'Jun 30', time:'10:00pm', home:'2º Grupo H',          away:'2º Grupo I',         group:'16avos', phase:'knockout'},
-  {id:85, date:'Jul 1',  time:'1:00pm',  home:'1º Grupo I',          away:'3º mejor',           group:'16avos', phase:'knockout'},
-  {id:86, date:'Jul 1',  time:'4:00pm',  home:'1º Grupo J',          away:'3º mejor',           group:'16avos', phase:'knockout'},
-  {id:87, date:'Jul 1',  time:'7:00pm',  home:'2º Grupo J',          away:'2º Grupo K',         group:'16avos', phase:'knockout'},
-  {id:88, date:'Jul 1',  time:'10:00pm', home:'1º Grupo K',          away:'1º Grupo L',         group:'16avos', phase:'knockout'},
+  {id:73, date:'Jun 28', time:'1:00pm', home:'2º Grupo A', away:'2º Grupo B', group:'16avos', phase:'knockout'},
+  {id:74, date:'Jun 28', time:'4:00pm', home:'1º Grupo C', away:'3º mejor', group:'16avos', phase:'knockout'},
+  {id:75, date:'Jun 28', time:'7:00pm', home:'1º Grupo A', away:'3º mejor', group:'16avos', phase:'knockout'},
+  {id:76, date:'Jun 28', time:'10:00pm', home:'1º Grupo B', away:'3º mejor', group:'16avos', phase:'knockout'},
+  {id:77, date:'Jun 29', time:'1:00pm', home:'1º Grupo F', away:'2º Grupo E', group:'16avos', phase:'knockout'},
+  {id:78, date:'Jun 29', time:'4:00pm', home:'1º Grupo D', away:'3º mejor', group:'16avos', phase:'knockout'},
+  {id:79, date:'Jun 29', time:'7:00pm', home:'2º Grupo C', away:'2º Grupo D', group:'16avos', phase:'knockout'},
+  {id:80, date:'Jun 29', time:'10:00pm', home:'1º Grupo E', away:'3º mejor', group:'16avos', phase:'knockout'},
+  {id:81, date:'Jun 30', time:'1:00pm', home:'1º Grupo G', away:'3º mejor', group:'16avos', phase:'knockout'},
+  {id:82, date:'Jun 30', time:'4:00pm', home:'2º Grupo F', away:'2º Grupo G', group:'16avos', phase:'knockout'},
+  {id:83, date:'Jun 30', time:'7:00pm', home:'1º Grupo H', away:'3º mejor', group:'16avos', phase:'knockout'},
+  {id:84, date:'Jun 30', time:'10:00pm', home:'2º Grupo H', away:'2º Grupo I', group:'16avos', phase:'knockout'},
+  {id:85, date:'Jul 1', time:'1:00pm', home:'1º Grupo I', away:'3º mejor', group:'16avos', phase:'knockout'},
+  {id:86, date:'Jul 1', time:'4:00pm', home:'1º Grupo J', away:'3º mejor', group:'16avos', phase:'knockout'},
+  {id:87, date:'Jul 1', time:'7:00pm', home:'2º Grupo J', away:'2º Grupo K', group:'16avos', phase:'knockout'},
+  {id:88, date:'Jul 1', time:'10:00pm', home:'1º Grupo K', away:'1º Grupo L', group:'16avos', phase:'knockout'},
   // OCTAVOS DE FINAL
-  {id:89, date:'Jul 3',  time:'2:00pm',  home:'G. P73',              away:'G. P74',             group:'Octavos', phase:'knockout'},
-  {id:90, date:'Jul 3',  time:'6:00pm',  home:'G. P75',              away:'G. P76',             group:'Octavos', phase:'knockout'},
-  {id:91, date:'Jul 4',  time:'2:00pm',  home:'G. P77',              away:'G. P78',             group:'Octavos', phase:'knockout'},
-  {id:92, date:'Jul 4',  time:'6:00pm',  home:'G. P79',              away:'G. P80',             group:'Octavos', phase:'knockout'},
-  {id:93, date:'Jul 5',  time:'2:00pm',  home:'G. P81',              away:'G. P82',             group:'Octavos', phase:'knockout'},
-  {id:94, date:'Jul 5',  time:'6:00pm',  home:'G. P83',              away:'G. P84',             group:'Octavos', phase:'knockout'},
-  {id:95, date:'Jul 6',  time:'2:00pm',  home:'G. P85',              away:'G. P86',             group:'Octavos', phase:'knockout'},
-  {id:96, date:'Jul 6',  time:'6:00pm',  home:'G. P87',              away:'G. P88',             group:'Octavos', phase:'knockout'},
+  {id:89, date:'Jul 3', time:'2:00pm', home:'G. P73', away:'G. P74', group:'Octavos', phase:'knockout'},
+  {id:90, date:'Jul 3', time:'6:00pm', home:'G. P75', away:'G. P76', group:'Octavos', phase:'knockout'},
+  {id:91, date:'Jul 4', time:'2:00pm', home:'G. P77', away:'G. P78', group:'Octavos', phase:'knockout'},
+  {id:92, date:'Jul 4', time:'6:00pm', home:'G. P79', away:'G. P80', group:'Octavos', phase:'knockout'},
+  {id:93, date:'Jul 5', time:'2:00pm', home:'G. P81', away:'G. P82', group:'Octavos', phase:'knockout'},
+  {id:94, date:'Jul 5', time:'6:00pm', home:'G. P83', away:'G. P84', group:'Octavos', phase:'knockout'},
+  {id:95, date:'Jul 6', time:'2:00pm', home:'G. P85', away:'G. P86', group:'Octavos', phase:'knockout'},
+  {id:96, date:'Jul 6', time:'6:00pm', home:'G. P87', away:'G. P88', group:'Octavos', phase:'knockout'},
   // CUARTOS DE FINAL
-  {id:97, date:'Jul 8',  time:'2:00pm',  home:'G. P89',              away:'G. P90',             group:'Cuartos', phase:'knockout'},
-  {id:98, date:'Jul 8',  time:'6:00pm',  home:'G. P91',              away:'G. P92',             group:'Cuartos', phase:'knockout'},
-  {id:99, date:'Jul 9',  time:'2:00pm',  home:'G. P93',              away:'G. P94',             group:'Cuartos', phase:'knockout'},
-  {id:100,date:'Jul 9',  time:'6:00pm',  home:'G. P95',              away:'G. P96',             group:'Cuartos', phase:'knockout'},
+  {id:97, date:'Jul 8', time:'2:00pm', home:'G. P89', away:'G. P90', group:'Cuartos', phase:'knockout'},
+  {id:98, date:'Jul 8', time:'6:00pm', home:'G. P91', away:'G. P92', group:'Cuartos', phase:'knockout'},
+  {id:99, date:'Jul 9', time:'2:00pm', home:'G. P93', away:'G. P94', group:'Cuartos', phase:'knockout'},
+  {id:100, date:'Jul 9', time:'6:00pm', home:'G. P95', away:'G. P96', group:'Cuartos', phase:'knockout'},
   // SEMIFINALES
-  {id:101,date:'Jul 12', time:'2:00pm',  home:'G. P97',              away:'G. P98',             group:'Semifinales', phase:'knockout'},
-  {id:102,date:'Jul 14', time:'2:00pm',  home:'G. P99',              away:'G. P100',            group:'Semifinales', phase:'knockout'},
+  {id:101, date:'Jul 12', time:'2:00pm', home:'G. P97', away:'G. P98', group:'Semifinales', phase:'knockout'},
+  {id:102, date:'Jul 14', time:'2:00pm', home:'G. P99', away:'G. P100', group:'Semifinales', phase:'knockout'},
   // TERCER PUESTO
-  {id:103,date:'Jul 17', time:'2:00pm',  home:'Perd. P101',          away:'Perd. P102',         group:'Tercer Puesto', phase:'knockout'},
+  {id:103, date:'Jul 17', time:'2:00pm', home:'Perd. P101', away:'Perd. P102', group:'Tercer Puesto', phase:'knockout'},
   // FINAL
-  {id:104,date:'Jul 19', time:'2:00pm',  home:'G. P101',             away:'G. P102',            group:'FINAL 🏆', phase:'knockout'}
+  {id:104, date:'Jul 19', time:'2:00pm', home:'G. P101', away:'G. P102', group:'FINAL 🏆', phase:'knockout'}
 ];
 
 const PLAYERS = ['Sr. Godoy', 'Mauricio Diaz', 'Don Timba', 'Nono', 'Andres Reina', 'John Triviño', 'Carlos Toro', 'DJ Asesor'];
@@ -558,7 +584,7 @@ let state = {
 
 function loadState() {
   // Embedded correct data - always authoritative for results
-  const defaultData = {"results":{"1":{"home":2,"away":0},"2":{"home":2,"away":1},"7":{"home":1,"away":1},"8":{"home":1,"away":1},"13":{"home":1,"away":1},"14":{"home":0,"away":1},"19":{"home":4,"away":1},"20":{"home":2,"away":0},"25":{"home":7,"away":1},"26":{"home":1,"away":0},"31":{"home":2,"away":2},"32":{"home":5,"away":1},"37":{"home":1,"away":1},"38":{"home":2,"away":2},"43":{"home":0,"away":0},"44":{"home":1,"away":1},"49":{"home":3,"away":1},"50":{"home":1,"away":4},"55":{"home":3,"away":0},"56":{"home":3,"away":1},"61":{"home":1,"away":1},"62":{"home":1,"away":3},"67":{"home":4,"away":2},"68":{"home":1,"away":0},"3":{"home":1,"away":1},"9":{"home":4,"away":1}},"predictions":{"Don Timba":{"1":{"home":2,"away":0},"2":{"home":1,"away":2},"3":{"home":1,"away":1},"4":{"home":2,"away":1},"7":{"home":2,"away":1},"8":{"home":0,"away":2},"9":{"home":2,"away":1},"10":{"home":2,"away":0},"13":{"home":2,"away":1},"14":{"home":0,"away":2},"19":{"home":1,"away":1},"20":{"home":1,"away":2},"25":{"home":4,"away":0},"26":{"home":1,"away":1},"31":{"home":2,"away":1},"32":{"home":1,"away":0},"37":{"home":2,"away":1},"38":{"home":2,"away":0},"43":{"home":2,"away":0},"44":{"home":1,"away":2},"49":{"home":1,"away":1},"50":{"home":0,"away":3},"55":{"home":2,"away":0},"56":{"home":2,"away":0},"61":{"home":4,"away":0},"62":{"home":0,"away":2},"67":{"home":1,"away":1},"68":{"home":2,"away":0}},"Sr. Godoy":{"1":{"home":2,"away":0},"2":{"home":1,"away":1},"7":{"home":2,"away":0},"8":{"home":0,"away":2},"13":{"home":3,"away":2},"14":{"home":1,"away":2},"19":{"home":2,"away":1},"20":{"home":1,"away":2},"25":{"home":3,"away":0},"26":{"home":1,"away":1},"31":{"home":2,"away":2},"32":{"home":2,"away":1},"37":{"home":3,"away":1},"38":{"home":2,"away":1},"43":{"home":4,"away":1},"44":{"home":1,"away":2},"49":{"home":2,"away":1},"50":{"home":1,"away":3},"55":{"home":2,"away":1},"56":{"home":2,"away":1},"61":{"home":2,"away":0},"62":{"home":0,"away":2},"67":{"home":2,"away":1},"68":{"home":1,"away":1}},"Andres Reina":{"1":{"home":2,"away":1},"2":{"home":1,"away":0},"7":{"home":2,"away":0},"8":{"home":0,"away":2},"13":{"home":2,"away":0},"14":{"home":0,"away":3},"19":{"home":2,"away":0},"20":{"home":1,"away":2},"25":{"home":6,"away":0},"26":{"home":0,"away":1},"31":{"home":2,"away":1},"32":{"home":2,"away":0},"37":{"home":2,"away":1},"38":{"home":1,"away":0},"43":{"home":3,"away":0},"44":{"home":0,"away":1},"49":{"home":2,"away":0},"50":{"home":0,"away":3},"55":{"home":3,"away":1},"56":{"home":2,"away":0},"61":{"home":2,"away":0},"62":{"home":1,"away":3},"67":{"home":2,"away":1},"68":{"home":1,"away":2}},"John Triviño":{"1":{"home":2,"away":1},"2":{"home":2,"away":1},"7":{"home":3,"away":1},"8":{"home":0,"away":3},"13":{"home":2,"away":1},"14":{"home":1,"away":3},"19":{"home":1,"away":2},"20":{"home":1,"away":2},"25":{"home":4,"away":0},"26":{"home":2,"away":2},"31":{"home":2,"away":1},"32":{"home":2,"away":1},"37":{"home":2,"away":1},"38":{"home":2,"away":1},"43":{"home":3,"away":1},"44":{"home":1,"away":2},"49":{"home":2,"away":1},"50":{"home":0,"away":3},"55":{"home":2,"away":1},"56":{"home":2,"away":0},"61":{"home":3,"away":1},"62":{"home":1,"away":3},"67":{"home":2,"away":1},"68":{"home":2,"away":1}},"Carlos Toro":{"1":{"home":2,"away":1},"2":{"home":1,"away":1},"7":{"home":2,"away":1},"8":{"home":0,"away":2},"13":{"home":2,"away":1},"14":{"home":0,"away":3},"19":{"home":2,"away":1},"20":{"home":0,"away":2},"25":{"home":3,"away":0},"26":{"home":1,"away":2},"31":{"home":1,"away":2},"32":{"home":0,"away":0},"37":{"home":3,"away":1},"38":{"home":1,"away":2},"43":{"home":5,"away":0},"44":{"home":1,"away":3},"49":{"home":2,"away":1},"50":{"home":1,"away":2},"55":{"home":3,"away":0},"56":{"home":0,"away":0},"61":{"home":2,"away":0},"62":{"home":1,"away":2},"67":{"home":2,"away":1},"68":{"home":1,"away":2}},"Nono":{"1":{"home":2,"away":0},"2":{"home":1,"away":2},"3":{"home":2,"away":0},"4":{"home":1,"away":2},"7":{"home":1,"away":2},"8":{"home":0,"away":3},"9":{"home":2,"away":1},"10":{"home":2,"away":0},"13":{"home":2,"away":2},"14":{"home":0,"away":2},"19":{"home":1,"away":1},"20":{"home":1,"away":2},"25":{"home":4,"away":0},"26":{"home":1,"away":2},"31":{"home":2,"away":2},"32":{"home":1,"away":1},"37":{"home":2,"away":0},"38":{"home":1,"away":2},"43":{"home":6,"away":0},"44":{"home":1,"away":3},"49":{"home":3,"away":1},"50":{"home":0,"away":2},"55":{"home":2,"away":1},"56":{"home":1,"away":0},"61":{"home":2,"away":1},"62":{"home":0,"away":2},"67":{"home":1,"away":1},"68":{"home":2,"away":0}},"DJ Asesor":{"1":{"home":1,"away":0},"2":{"away":1,"home":0},"7":{"home":3,"away":1},"8":{"home":1,"away":3},"13":{"home":4,"away":2},"14":{"home":0,"away":4},"19":{"home":2,"away":1},"20":{"home":1,"away":3},"25":{"home":5,"away":0},"26":{"home":1,"away":2},"31":{"home":2,"away":1},"32":{"home":1,"away":1},"37":{"home":3,"away":1},"38":{"home":2,"away":1},"43":{"home":5,"away":0},"44":{"home":1,"away":1},"49":{"home":4,"away":1},"50":{"home":1,"away":3},"55":{"home":3,"away":0},"56":{"home":2,"away":1},"61":{"home":3,"away":1},"62":{"home":1,"away":4},"67":{"home":3,"away":1},"68":{"home":2,"away":1}},"Mauricio Diaz":{"1":{"home":1,"away":0},"2":{"home":1,"away":1},"7":{"home":1,"away":0},"8":{"home":0,"away":3},"13":{"home":2,"away":1},"14":{"home":0,"away":3},"19":{"home":1,"away":1},"20":{"home":1,"away":2},"25":{"home":3,"away":0},"26":{"home":1,"away":2},"31":{"home":3,"away":1},"32":{"home":3,"away":1},"37":{"home":1,"away":1},"38":{"home":2,"away":2},"43":{"home":2,"away":1},"44":{"home":2,"away":1},"49":{"home":2,"away":1},"50":{"home":2,"away":2},"55":{"home":1,"away":0},"56":{"home":2,"away":0},"61":{"home":3,"away":1},"62":{"home":1,"away":1},"67":{"home":2,"away":2},"68":{"home":3,"away":1}}}};
+  const defaultData = {"results":{"1":{"home":2,"away":0},"2":{"home":2,"away":1},"3":{"home":1,"away":1},"5":{"home":1,"away":1},"6":{"home":1,"away":1},"7":{"home":0,"away":1},"4":{"home":4,"away":1},"8":{"home":2,"away":0},"9":{"home":7,"away":1},"11":{"home":1,"away":0},"10":{"home":2,"away":2},"12":{"home":5,"away":1},"14":{"home":1,"away":1},"16":{"home":2,"away":2},"13":{"home":0,"away":0},"15":{"home":1,"away":1},"17":{"home":3,"away":1},"18":{"home":1,"away":4},"19":{"home":3,"away":0},"20":{"home":3,"away":1},"21":{"home":1,"away":1},"24":{"home":1,"away":3},"22":{"home":4,"away":2},"23":{"home":1,"away":0},"25":{"home":1,"away":1},"26":{"home":4,"away":1}},"predictions":{"Don Timba":{"1":{"home":2,"away":0},"2":{"home":1,"away":2},"25":{"home":1,"away":1},"28":{"home":2,"away":1},"3":{"home":2,"away":1},"5":{"home":0,"away":2},"26":{"home":2,"away":1},"27":{"home":2,"away":0},"6":{"home":2,"away":1},"7":{"home":0,"away":2},"4":{"home":1,"away":1},"8":{"home":1,"away":2},"9":{"home":4,"away":0},"11":{"home":1,"away":1},"10":{"home":2,"away":1},"12":{"home":1,"away":0},"14":{"home":2,"away":1},"16":{"home":2,"away":0},"13":{"home":2,"away":0},"15":{"home":1,"away":2},"17":{"home":1,"away":1},"18":{"home":0,"away":3},"19":{"home":2,"away":0},"20":{"home":2,"away":0},"21":{"home":4,"away":0},"24":{"home":0,"away":2},"22":{"home":1,"away":1},"23":{"home":2,"away":0}},"Sr. Godoy":{"1":{"home":2,"away":0},"2":{"home":1,"away":1},"3":{"home":2,"away":0},"5":{"home":0,"away":2},"6":{"home":3,"away":2},"7":{"home":1,"away":2},"4":{"home":2,"away":1},"8":{"home":1,"away":2},"9":{"home":3,"away":0},"11":{"home":1,"away":1},"10":{"home":2,"away":2},"12":{"home":2,"away":1},"14":{"home":3,"away":1},"16":{"home":2,"away":1},"13":{"home":4,"away":1},"15":{"home":1,"away":2},"17":{"home":2,"away":1},"18":{"home":1,"away":3},"19":{"home":2,"away":1},"20":{"home":2,"away":1},"21":{"home":2,"away":0},"24":{"home":0,"away":2},"22":{"home":2,"away":1},"23":{"home":1,"away":1}},"Andres Reina":{"1":{"home":2,"away":1},"2":{"home":1,"away":0},"3":{"home":2,"away":0},"5":{"home":0,"away":2},"6":{"home":2,"away":0},"7":{"home":0,"away":3},"4":{"home":2,"away":0},"8":{"home":1,"away":2},"9":{"home":6,"away":0},"11":{"home":0,"away":1},"10":{"home":2,"away":1},"12":{"home":2,"away":0},"14":{"home":2,"away":1},"16":{"home":1,"away":0},"13":{"home":3,"away":0},"15":{"home":0,"away":1},"17":{"home":2,"away":0},"18":{"home":0,"away":3},"19":{"home":3,"away":1},"20":{"home":2,"away":0},"21":{"home":2,"away":0},"24":{"home":1,"away":3},"22":{"home":2,"away":1},"23":{"home":1,"away":2}},"John Triviño":{"1":{"home":2,"away":1},"2":{"home":2,"away":1},"3":{"home":3,"away":1},"5":{"home":0,"away":3},"6":{"home":2,"away":1},"7":{"home":1,"away":3},"4":{"home":1,"away":2},"8":{"home":1,"away":2},"9":{"home":4,"away":0},"11":{"home":2,"away":2},"10":{"home":2,"away":1},"12":{"home":2,"away":1},"14":{"home":2,"away":1},"16":{"home":2,"away":1},"13":{"home":3,"away":1},"15":{"home":1,"away":2},"17":{"home":2,"away":1},"18":{"home":0,"away":3},"19":{"home":2,"away":1},"20":{"home":2,"away":0},"21":{"home":3,"away":1},"24":{"home":1,"away":3},"22":{"home":2,"away":1},"23":{"home":2,"away":1}},"Carlos Toro":{"1":{"home":2,"away":1},"2":{"home":1,"away":1},"3":{"home":2,"away":1},"5":{"home":0,"away":2},"6":{"home":2,"away":1},"7":{"home":0,"away":3},"4":{"home":2,"away":1},"8":{"home":0,"away":2},"9":{"home":3,"away":0},"11":{"home":1,"away":2},"10":{"home":1,"away":2},"12":{"home":0,"away":0},"14":{"home":3,"away":1},"16":{"home":1,"away":2},"13":{"home":5,"away":0},"15":{"home":1,"away":3},"17":{"home":2,"away":1},"18":{"home":1,"away":2},"19":{"home":3,"away":0},"20":{"home":0,"away":0},"21":{"home":2,"away":0},"24":{"home":1,"away":2},"22":{"home":2,"away":1},"23":{"home":1,"away":2}},"Nono":{"1":{"home":2,"away":0},"2":{"home":1,"away":2},"25":{"home":2,"away":0},"28":{"home":1,"away":2},"3":{"home":1,"away":2},"5":{"home":0,"away":3},"26":{"home":2,"away":1},"27":{"home":2,"away":0},"6":{"home":2,"away":2},"7":{"home":0,"away":2},"4":{"home":1,"away":1},"8":{"home":1,"away":2},"9":{"home":4,"away":0},"11":{"home":1,"away":2},"10":{"home":2,"away":2},"12":{"home":1,"away":1},"14":{"home":2,"away":0},"16":{"home":1,"away":2},"13":{"home":6,"away":0},"15":{"home":1,"away":3},"17":{"home":3,"away":1},"18":{"home":0,"away":2},"19":{"home":2,"away":1},"20":{"home":1,"away":0},"21":{"home":2,"away":1},"24":{"home":0,"away":2},"22":{"home":1,"away":1},"23":{"home":2,"away":0}},"DJ Asesor":{"1":{"home":1,"away":0},"2":{"away":1,"home":0},"3":{"home":3,"away":1},"5":{"home":1,"away":3},"6":{"home":4,"away":2},"7":{"home":0,"away":4},"4":{"home":2,"away":1},"8":{"home":1,"away":3},"9":{"home":5,"away":0},"11":{"home":1,"away":2},"10":{"home":2,"away":1},"12":{"home":1,"away":1},"14":{"home":3,"away":1},"16":{"home":2,"away":1},"13":{"home":5,"away":0},"15":{"home":1,"away":1},"17":{"home":4,"away":1},"18":{"home":1,"away":3},"19":{"home":3,"away":0},"20":{"home":2,"away":1},"21":{"home":3,"away":1},"24":{"home":1,"away":4},"22":{"home":3,"away":1},"23":{"home":2,"away":1}},"Mauricio Diaz":{"1":{"home":1,"away":0},"2":{"home":1,"away":1},"3":{"home":1,"away":0},"5":{"home":0,"away":3},"6":{"home":2,"away":1},"7":{"home":0,"away":3},"4":{"home":1,"away":1},"8":{"home":1,"away":2},"9":{"home":3,"away":0},"11":{"home":1,"away":2},"10":{"home":3,"away":1},"12":{"home":3,"away":1},"14":{"home":1,"away":1},"16":{"home":2,"away":2},"13":{"home":2,"away":1},"15":{"home":2,"away":1},"17":{"home":2,"away":1},"18":{"home":2,"away":2},"19":{"home":1,"away":0},"20":{"home":2,"away":0},"21":{"home":3,"away":1},"24":{"home":1,"away":1},"22":{"home":2,"away":2},"23":{"home":3,"away":1}}}};
   try {
     const s = localStorage.getItem('polla2026');
     if (s) {
