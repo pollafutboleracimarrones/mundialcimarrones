@@ -583,57 +583,20 @@ let state = {
 };
 
 function loadState() {
-  // ID remapping for migration from old jornada-disordered IDs to new sequential ones
-  const ID_MAP = {"1":1,"2":2,"7":3,"19":4,"8":5,"13":6,"14":7,"20":8,"25":9,"31":10,"26":11,"32":12,"43":13,"37":14,"44":15,"38":16,"49":17,"50":18,"55":19,"56":20,"61":21,"67":22,"68":23,"62":24,"3":25,"9":26,"10":27,"4":28,"21":29,"15":30,"16":31,"22":32,"33":33,"27":34,"28":35,"34":36,"45":37,"39":38,"46":39,"40":40,"57":41,"51":42,"52":43,"58":44,"63":45,"69":46,"70":47,"64":48,"5":49,"6":50,"11":51,"12":52,"17":53,"18":54,"23":55,"24":56,"29":57,"30":58,"35":59,"36":60,"41":61,"42":62,"47":63,"48":64,"53":65,"54":66,"59":67,"60":68,"65":69,"66":70,"71":71,"72":72};
-
-  function remapIds(obj) {
-    const result = {};
-    for (const k in obj) {
-      const newId = ID_MAP[k] || k;
-      result[newId] = obj[k];
-    }
-    return result;
-  }
-
-  const DATA_VERSION = 'v2-jornada-renumbered';
-  const defaultData = {"results":{"1":{"home":2,"away":0},"2":{"home":2,"away":1},"3":{"home":1,"away":1},"5":{"home":1,"away":1},"6":{"home":1,"away":1},"7":{"home":0,"away":1},"4":{"home":4,"away":1},"8":{"home":2,"away":0},"9":{"home":7,"away":1},"11":{"home":1,"away":0},"10":{"home":2,"away":2},"12":{"home":5,"away":1},"14":{"home":1,"away":1},"16":{"home":2,"away":2},"13":{"home":0,"away":0},"15":{"home":1,"away":1},"17":{"home":3,"away":1},"18":{"home":1,"away":4},"19":{"home":3,"away":0},"20":{"home":3,"away":1},"21":{"home":1,"away":1},"24":{"home":1,"away":3},"22":{"home":4,"away":2},"23":{"home":1,"away":0},"25":{"home":1,"away":1},"26":{"home":4,"away":1}},"predictions":{"Don Timba":{"1":{"home":2,"away":0},"2":{"home":1,"away":2},"25":{"home":1,"away":1},"28":{"home":2,"away":1},"3":{"home":2,"away":1},"5":{"home":0,"away":2},"26":{"home":2,"away":1},"27":{"home":2,"away":0},"6":{"home":2,"away":1},"7":{"home":0,"away":2},"4":{"home":1,"away":1},"8":{"home":1,"away":2},"9":{"home":4,"away":0},"11":{"home":1,"away":1},"10":{"home":2,"away":1},"12":{"home":1,"away":0},"14":{"home":2,"away":1},"16":{"home":2,"away":0},"13":{"home":2,"away":0},"15":{"home":1,"away":2},"17":{"home":1,"away":1},"18":{"home":0,"away":3},"19":{"home":2,"away":0},"20":{"home":2,"away":0},"21":{"home":4,"away":0},"24":{"home":0,"away":2},"22":{"home":1,"away":1},"23":{"home":2,"away":0}},"Sr. Godoy":{"1":{"home":2,"away":0},"2":{"home":1,"away":1},"3":{"home":2,"away":0},"5":{"home":0,"away":2},"6":{"home":3,"away":2},"7":{"home":1,"away":2},"4":{"home":2,"away":1},"8":{"home":1,"away":2},"9":{"home":3,"away":0},"11":{"home":1,"away":1},"10":{"home":2,"away":2},"12":{"home":2,"away":1},"14":{"home":3,"away":1},"16":{"home":2,"away":1},"13":{"home":4,"away":1},"15":{"home":1,"away":2},"17":{"home":2,"away":1},"18":{"home":1,"away":3},"19":{"home":2,"away":1},"20":{"home":2,"away":1},"21":{"home":2,"away":0},"24":{"home":0,"away":2},"22":{"home":2,"away":1},"23":{"home":1,"away":1}},"Andres Reina":{"1":{"home":2,"away":1},"2":{"home":1,"away":0},"3":{"home":2,"away":0},"5":{"home":0,"away":2},"6":{"home":2,"away":0},"7":{"home":0,"away":3},"4":{"home":2,"away":0},"8":{"home":1,"away":2},"9":{"home":6,"away":0},"11":{"home":0,"away":1},"10":{"home":2,"away":1},"12":{"home":2,"away":0},"14":{"home":2,"away":1},"16":{"home":1,"away":0},"13":{"home":3,"away":0},"15":{"home":0,"away":1},"17":{"home":2,"away":0},"18":{"home":0,"away":3},"19":{"home":3,"away":1},"20":{"home":2,"away":0},"21":{"home":2,"away":0},"24":{"home":1,"away":3},"22":{"home":2,"away":1},"23":{"home":1,"away":2}},"John Triviño":{"1":{"home":2,"away":1},"2":{"home":2,"away":1},"3":{"home":3,"away":1},"5":{"home":0,"away":3},"6":{"home":2,"away":1},"7":{"home":1,"away":3},"4":{"home":1,"away":2},"8":{"home":1,"away":2},"9":{"home":4,"away":0},"11":{"home":2,"away":2},"10":{"home":2,"away":1},"12":{"home":2,"away":1},"14":{"home":2,"away":1},"16":{"home":2,"away":1},"13":{"home":3,"away":1},"15":{"home":1,"away":2},"17":{"home":2,"away":1},"18":{"home":0,"away":3},"19":{"home":2,"away":1},"20":{"home":2,"away":0},"21":{"home":3,"away":1},"24":{"home":1,"away":3},"22":{"home":2,"away":1},"23":{"home":2,"away":1}},"Carlos Toro":{"1":{"home":2,"away":1},"2":{"home":1,"away":1},"3":{"home":2,"away":1},"5":{"home":0,"away":2},"6":{"home":2,"away":1},"7":{"home":0,"away":3},"4":{"home":2,"away":1},"8":{"home":0,"away":2},"9":{"home":3,"away":0},"11":{"home":1,"away":2},"10":{"home":1,"away":2},"12":{"home":0,"away":0},"14":{"home":3,"away":1},"16":{"home":1,"away":2},"13":{"home":5,"away":0},"15":{"home":1,"away":3},"17":{"home":2,"away":1},"18":{"home":1,"away":2},"19":{"home":3,"away":0},"20":{"home":0,"away":0},"21":{"home":2,"away":0},"24":{"home":1,"away":2},"22":{"home":2,"away":1},"23":{"home":1,"away":2}},"Nono":{"1":{"home":2,"away":0},"2":{"home":1,"away":2},"25":{"home":2,"away":0},"28":{"home":1,"away":2},"3":{"home":1,"away":2},"5":{"home":0,"away":3},"26":{"home":2,"away":1},"27":{"home":2,"away":0},"6":{"home":2,"away":2},"7":{"home":0,"away":2},"4":{"home":1,"away":1},"8":{"home":1,"away":2},"9":{"home":4,"away":0},"11":{"home":1,"away":2},"10":{"home":2,"away":2},"12":{"home":1,"away":1},"14":{"home":2,"away":0},"16":{"home":1,"away":2},"13":{"home":6,"away":0},"15":{"home":1,"away":3},"17":{"home":3,"away":1},"18":{"home":0,"away":2},"19":{"home":2,"away":1},"20":{"home":1,"away":0},"21":{"home":2,"away":1},"24":{"home":0,"away":2},"22":{"home":1,"away":1},"23":{"home":2,"away":0}},"DJ Asesor":{"1":{"home":1,"away":0},"2":{"away":1,"home":0},"3":{"home":3,"away":1},"5":{"home":1,"away":3},"6":{"home":4,"away":2},"7":{"home":0,"away":4},"4":{"home":2,"away":1},"8":{"home":1,"away":3},"9":{"home":5,"away":0},"11":{"home":1,"away":2},"10":{"home":2,"away":1},"12":{"home":1,"away":1},"14":{"home":3,"away":1},"16":{"home":2,"away":1},"13":{"home":5,"away":0},"15":{"home":1,"away":1},"17":{"home":4,"away":1},"18":{"home":1,"away":3},"19":{"home":3,"away":0},"20":{"home":2,"away":1},"21":{"home":3,"away":1},"24":{"home":1,"away":4},"22":{"home":3,"away":1},"23":{"home":2,"away":1}},"Mauricio Diaz":{"1":{"home":1,"away":0},"2":{"home":1,"away":1},"3":{"home":1,"away":0},"5":{"home":0,"away":3},"6":{"home":2,"away":1},"7":{"home":0,"away":3},"4":{"home":1,"away":1},"8":{"home":1,"away":2},"9":{"home":3,"away":0},"11":{"home":1,"away":2},"10":{"home":3,"away":1},"12":{"home":3,"away":1},"14":{"home":1,"away":1},"16":{"home":2,"away":2},"13":{"home":2,"away":1},"15":{"home":2,"away":1},"17":{"home":2,"away":1},"18":{"home":2,"away":2},"19":{"home":1,"away":0},"20":{"home":2,"away":0},"21":{"home":3,"away":1},"24":{"home":1,"away":1},"22":{"home":2,"away":2},"23":{"home":3,"away":1}}}};
   try {
-    const savedVersion = localStorage.getItem('polla2026_version');
     const s = localStorage.getItem('polla2026');
     if (s) {
       const d = JSON.parse(s);
-      if (savedVersion === DATA_VERSION) {
-        // Already migrated - use as is
-        state.results = defaultData.results||{};
-        state.predictions = d.predictions||defaultData.predictions||{};
-        state.locked = d.locked||{};
-        saveState();
-        return;
-      } else {
-        // Old version - migrate predictions/locks using ID_MAP, results always from embedded
-        const migratedPredictions = {};
-        for (const player in (d.predictions || {})) {
-          migratedPredictions[player] = remapIds(d.predictions[player]);
-        }
-        const migratedLocked = {};
-        for (const player in (d.locked || {})) {
-          migratedLocked[player] = remapIds(d.locked[player]);
-        }
-        state.results = defaultData.results||{};
-        state.predictions = Object.keys(migratedPredictions).length ? migratedPredictions : (defaultData.predictions||{});
-        state.locked = migratedLocked;
-        localStorage.setItem('polla2026_version', DATA_VERSION);
-        saveState();
-        return;
-      }
+      state.results = d.results || {};
+      state.predictions = d.predictions || {};
+      state.locked = d.locked || {};
+      return;
     }
   } catch(e) {}
-  // No localStorage at all - use embedded defaults
-  state.results = defaultData.results||{};
-  state.predictions = defaultData.predictions||{};
+  // No localStorage yet - start empty
+  state.results = {};
+  state.predictions = {};
   state.locked = {};
-  localStorage.setItem('polla2026_version', DATA_VERSION);
-  saveState();
 }
 function saveState() {
   localStorage.setItem('polla2026', JSON.stringify({results: state.results, predictions: state.predictions, locked: state.locked}));
@@ -1087,7 +1050,7 @@ function renderPredictions() {
       <div class="pred-match-header">
         <div style="font-size:12px;color:var(--muted);">P${m.id} · ${m.date} · ${m.time||''} · ${m.phase==='groups'?'Grupo '+m.group:m.group}</div>
         <div style="display:flex;gap:6px;align-items:center;">
-          ${isMatchLocked ? '<span style="font-size:11px;color:var(--green);font-weight:700;">🔒 Guardado</span>' : ''}
+          ${isMatchLocked ? `<span style="font-size:11px;color:var(--green);font-weight:700;">🔒 Guardado</span> <button onclick="unlockMatch('${player}',${m.id})" style="background:none;border:1px solid var(--border);color:var(--accent);padding:2px 8px;border-radius:5px;cursor:pointer;font-size:11px;">✏️ Editar</button>` : ''}
           ${ptsHtml}
         </div>
       </div>
@@ -1164,7 +1127,8 @@ function unlockMatch(player, matchId) {
   if (state.locked[player]) delete state.locked[player][matchId];
   saveState();
   showToast(`✓ Partido desbloqueado`);
-  renderAdmin();
+  if (document.getElementById('tab-admin')?.classList.contains('active')) renderAdmin();
+  if (document.getElementById('tab-predicciones')?.classList.contains('active')) renderPredictions();
 }
 
 // ========================
