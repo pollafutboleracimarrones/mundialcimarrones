@@ -1398,17 +1398,34 @@ async function syncResults() {
 
       if (homeScore == null || awayScore == null) return;
 
-      const ourMatch = MATCHES_DATA.find(m => {
+      let ourMatch = MATCHES_DATA.find(m => {
         if (!pendingIds.has(m.id)) return false; // skip matches we already have confirmed
         const h = normalize(m.home);
         const a = normalize(m.away);
         return h === homeTeam && a === awayTeam;
       });
 
+      let finalHomeScore = homeScore, finalAwayScore = awayScore;
+
+      // If not found in normal order, try reversed (API may report teams in different order)
+      if (!ourMatch) {
+        ourMatch = MATCHES_DATA.find(m => {
+          if (!pendingIds.has(m.id)) return false;
+          const h = normalize(m.home);
+          const a = normalize(m.away);
+          return h === awayTeam && a === homeTeam;
+        });
+        if (ourMatch) {
+          // Swap scores to match our stored home/away order
+          finalHomeScore = awayScore;
+          finalAwayScore = homeScore;
+        }
+      }
+
       if (ourMatch) {
-        state.results[ourMatch.id] = { home: homeScore, away: awayScore };
+        state.results[ourMatch.id] = { home: finalHomeScore, away: finalAwayScore };
         updated++;
-        log.push(`✓ P${ourMatch.id} ${ourMatch.home} ${homeScore}-${awayScore} ${ourMatch.away}`);
+        log.push(`✓ P${ourMatch.id} ${ourMatch.home} ${finalHomeScore}-${finalAwayScore} ${ourMatch.away}`);
       }
     });
 
