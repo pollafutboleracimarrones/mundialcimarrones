@@ -807,7 +807,94 @@ function renderGrupos() {
       </table>
       <div style="padding:5px 10px;font-size:10px;color:var(--muted);border-top:1px solid var(--border);">✓ <span style="color:var(--green);">Top 2</span> clasifican directo · <span style="color:var(--accent);">3° mejor</span> puede clasificar</div>
     </div>`;
+  }).join('') + renderKnockoutBracket(groupStandings);
+}
+
+function renderKnockoutBracket(groupStandings) {
+  // Determine how many matches have been played total in groups
+  const totalGroupMatchesPlayed = MATCHES_DATA.filter(m => m.phase === 'groups' && state.results[m.id]).length;
+  const allGroupsComplete = totalGroupMatchesPlayed === 72; // all 72 group matches played
+
+  // Build qualifier map: "1º Grupo A" -> team name, etc.
+  const qualifierMap = {};
+  const thirdPlaceCandidates = [];
+
+  Object.entries(groupStandings).forEach(([grp, teams]) => {
+    if (teams[0] && teams[0].pj > 0) qualifierMap[`1º Grupo ${grp}`] = teams[0];
+    if (teams[1] && teams[1].pj > 0) qualifierMap[`2º Grupo ${grp}`] = teams[1];
+    if (teams[2] && teams[2].pj > 0) thirdPlaceCandidates.push({ ...teams[2], fromGroup: grp });
+  });
+
+  // Sort third-place teams by pts, dg, gf to find best 8
+  thirdPlaceCandidates.sort((a,b) => b.pts-a.pts || b.dg-a.dg || b.gf-a.gf);
+  const bestThirds = thirdPlaceCandidates.filter(t => t.pj === 3); // only fully played groups count officially
+  const allThirdsSorted = thirdPlaceCandidates; // for partial display even if not all pj=3
+
+  // Assign "3º mejor" slots in the order they appear in MATCHES_DATA for 16avos (8 slots)
+  const knockoutMatches = MATCHES_DATA.filter(m => m.phase === 'knockout' && m.group === '16avos');
+  let thirdIdx = 0;
+  const thirdSlotAssignments = {}; // matchId+side -> team
+
+  function resolveTeam(placeholder, matchId, side) {
+    if (qualifierMap[placeholder]) return qualifierMap[placeholder].team;
+    if (placeholder === '3º mejor') {
+      const key = `${matchId}-${side}`;
+      if (!thirdSlotAssignments[key]) {
+        const candidate = allThirdsSorted[thirdIdx];
+        if (candidate) {
+          thirdSlotAssignments[key] = candidate.team;
+          thirdIdx++;
+        }
+      }
+      return thirdSlotAssignments[key] || null;
+    }
+    return null;
+  }
+
+  const rows = knockoutMatches.map(m => {
+    const homeTeam = resolveTeam(m.home, m.id, 'home');
+    const awayTeam = resolveTeam(m.away, m.id, 'away');
+
+    // If both teams resolved, update MATCHES_DATA in place so predictions/sync can use real names
+    if (homeTeam && awayTeam) {
+      const matchRef = MATCHES_DATA.find(mm => mm.id === m.id);
+      if (matchRef && (matchRef.home !== homeTeam || matchRef.away !== awayTeam)) {
+        matchRef.home = homeTeam;
+        matchRef.away = awayTeam;
+      }
+    }
+
+    const flagH = homeTeam ? (FLAGS[homeTeam] || '🏳️') : '❓';
+    const flagA = awayTeam ? (FLAGS[awayTeam] || '🏳️') : '❓';
+    const homeName = homeTeam || m.home;
+    const awayName = awayTeam || m.away;
+    const bothKnown = !!(homeTeam && awayTeam);
+    return `<div style="background:var(--surface);border:1px solid ${bothKnown ? 'var(--accent)' : 'var(--border)'};border-radius:8px;padding:10px 12px;margin-bottom:6px;">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:6px;">P${m.id} · ${m.date} · ${m.time}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+        <span style="font-size:13px;font-weight:${bothKnown?700:400};flex:1;">${flagH} ${homeName}</span>
+        <span style="font-size:11px;color:var(--muted);">vs</span>
+        <span style="font-size:13px;font-weight:${bothKnown?700:400};flex:1;text-align:right;">${awayName} ${flagA}</span>
+      </div>
+    </div>`;
   }).join('');
+
+  const thirdsInfo = allThirdsSorted.length ? `
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:11px;color:var(--muted);">
+      <strong style="color:var(--accent);">Mejores terceros (parcial):</strong><br/>
+      ${allThirdsSorted.slice(0,8).map((t,i) => `${i+1}. ${FLAGS[t.team]||'🏳️'} ${t.team} (Gr.${t.fromGroup}) - ${t.pts}pts`).join('<br/>')}
+    </div>` : '';
+
+  return `
+    <div style="margin-top:20px;">
+      <div style="font-size:16px;font-weight:800;color:var(--accent);margin-bottom:6px;">🏆 16avos de Final</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">
+        ${allGroupsComplete ? '✓ Fase de grupos completa — cuadro definitivo' : '⏳ Cuadro provisional, se actualiza con cada resultado'}
+      </div>
+      ${thirdsInfo}
+      ${rows}
+    </div>
+  `;
 }
 
 // ========================
@@ -1178,23 +1265,30 @@ function clearResult() {
 // ADMIN
 // ========================
 function renderAdmin() {
-  // Lock admin
+  // Lock admin - collapsible accordion per player
   const lockList = document.getElementById('lock-admin-list');
-  lockList.innerHTML = PLAYERS.map(p => {
+  lockList.innerHTML = PLAYERS.map((p, idx) => {
     const lockedMatches = state.locked[p] || {};
     const lockedIds = Object.keys(lockedMatches);
-    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:8px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${lockedIds.length?'8px':'0'};">
+    const panelId = `lock-panel-${idx}`;
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden;">
+      <div onclick="document.getElementById('${panelId}').style.display=document.getElementById('${panelId}').style.display==='none'?'block':'none';document.getElementById('${panelId}-arrow').textContent=document.getElementById('${panelId}').style.display==='none'?'›':'⌄'"
+        style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;">
         <span style="font-weight:700;font-size:14px;">${p}</span>
-        <span style="font-size:12px;color:var(--muted);">${lockedIds.length} partido(s) bloqueado(s)</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:12px;color:var(--muted);">${lockedIds.length} bloqueado(s)</span>
+          <span id="${panelId}-arrow" style="font-size:16px;color:var(--muted);">›</span>
+        </div>
       </div>
-      ${lockedIds.length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;">
-        ${lockedIds.map(mid => `
-          <span style="background:var(--surface2);border:1px solid var(--green);border-radius:6px;padding:3px 8px;font-size:12px;display:flex;align-items:center;gap:6px;">
-            🔒 P${mid}
-            <button onclick="unlockMatch('${p}',${mid})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:12px;padding:0;">✕</button>
-          </span>`).join('')}
-      </div>` : '<span style="font-size:12px;color:var(--muted);">Sin partidos bloqueados</span>'}
+      <div id="${panelId}" style="display:none;padding:0 14px 14px;">
+        ${lockedIds.length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;">
+          ${lockedIds.map(mid => `
+            <span style="background:var(--surface2);border:1px solid var(--green);border-radius:6px;padding:3px 8px;font-size:12px;display:flex;align-items:center;gap:6px;">
+              🔒 P${mid}
+              <button onclick="unlockMatch('${p}',${mid})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:12px;padding:0;">✕</button>
+            </span>`).join('')}
+        </div>` : '<span style="font-size:12px;color:var(--muted);">Sin partidos bloqueados</span>'}
+      </div>
     </div>`;
   }).join('');
 
