@@ -245,7 +245,7 @@
     <div style="margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
       <div>
         <div style="font-size:22px; font-weight:800; color:var(--text);">Tabla de Posiciones</div>
-        <div style="font-size:13px; color:var(--muted); margin-top:2px;">Resultado Exacto = <strong style="color:var(--accent)">2pts</strong> · Ganador Correcto = <strong style="color:var(--blue)">1pt</strong></div>
+        <div style="font-size:13px; color:var(--muted); margin-top:2px;">Resultado Exacto = <strong style="color:var(--accent)">2pts</strong> · Ganador Correcto = <strong style="color:var(--blue)">1pt</strong> · 🏆 Podio Final = <strong style="color:var(--accent)">+3pts</strong> c/u <span style="color:var(--muted);">(se evalúa al definirse semifinales)</span></div>
       </div>
       <div id="total-matches-played" style="font-size:13px; color:var(--muted);"></div>
     </div>
@@ -299,6 +299,7 @@
     <!-- Vista 2: Partidos del jugador seleccionado -->
     <div id="pred-player-view" style="display:none;">
       <div id="pred-header" style="margin-bottom:12px;"></div>
+      <div id="podium-section" style="margin-bottom:16px;"></div>
       <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
         <button class="filter-btn active" onclick="filterPred('all',this)">Todos</button>
         <button class="filter-btn" onclick="filterPred('pending',this)">Sin predicción</button>
@@ -332,6 +333,11 @@
     <div class="admin-section">
       <div class="admin-title">⚽ Registrar Resultado Manual</div>
       <div id="results-list"></div>
+    </div>
+    <div class="admin-section">
+      <div class="admin-title">🏆 Podio Final Real</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px;">⏳ Los puntos NO se suman hasta llenar los 4 puestos. Espera a que el Mundial defina realmente al Campeón, Subcampeón, 3° y 4° puesto (tras la Final y el partido por el Tercer Puesto) y entonces complétalos aquí — ahí se evalúan y suman automáticamente +3 pts por cada acierto.</div>
+      <div id="real-podium-form"></div>
     </div>
     <div class="admin-section">
       <div class="admin-title">🔒 Bloqueos de predicciones</div>
@@ -577,6 +583,9 @@ let state = {
   results: {}, // matchId -> {home: N, away: N}
   predictions: {}, // playerName -> {matchId -> {home: N, away: N}}
   locked: {}, // playerName -> true
+  podium: {}, // playerName -> {campeon, subcampeon, tercero, cuarto}
+  podiumLocked: {}, // playerName -> true
+  realPodium: {}, // {campeon, subcampeon, tercero, cuarto} - set by admin at the end
   matchFilter: 'all',
   predFilter: 'all',
   selectedPlayer: PLAYERS[0],
@@ -594,6 +603,9 @@ function loadState() {
         state.results = d.results || {};
         state.predictions = d.predictions || {};
         state.locked = d.locked || {};
+        state.podium = d.podium || {};
+        state.podiumLocked = d.podiumLocked || {};
+        state.realPodium = d.realPodium || {};
         return;
       }
     }
@@ -602,10 +614,13 @@ function loadState() {
   state.results = BACKUP_DATA.results || {};
   state.predictions = BACKUP_DATA.predictions || {};
   state.locked = {};
+  state.podium = {};
+  state.podiumLocked = {};
+  state.realPodium = {};
   saveState();
 }
 function saveState() {
-  localStorage.setItem('polla2026', JSON.stringify({results: state.results, predictions: state.predictions, locked: state.locked}));
+  localStorage.setItem('polla2026', JSON.stringify({results: state.results, predictions: state.predictions, locked: state.locked, podium: state.podium, podiumLocked: state.podiumLocked, realPodium: state.realPodium}));
 }
 
 // ========================
@@ -623,6 +638,20 @@ function calcPoints(pred, result) {
   return 0;
 }
 
+function getPodiumPoints(player) {
+  const pick = state.podium[player];
+  const real = state.realPodium || {};
+  // Solo se evalúa cuando los 4 puestos reales ya están definidos (Mundial llegó a semifinales/final)
+  const realComplete = real.campeon && real.subcampeon && real.tercero && real.cuarto;
+  if (!pick || !realComplete) return 0;
+  let pts = 0;
+  if (pick.campeon && pick.campeon === real.campeon) pts += 3;
+  if (pick.subcampeon && pick.subcampeon === real.subcampeon) pts += 3;
+  if (pick.tercero && pick.tercero === real.tercero) pts += 3;
+  if (pick.cuarto && pick.cuarto === real.cuarto) pts += 3;
+  return pts;
+}
+
 function getPlayerStats(player) {
   let pts = 0, exact = 0, winner = 0, total = 0;
   const preds = state.predictions[player] || {};
@@ -636,8 +665,10 @@ function getPlayerStats(player) {
     if (p === 2) exact++;
     if (p === 1) winner++;
   }
+  const podiumPts = getPodiumPoints(player);
+  pts += podiumPts;
   const predCount = Object.keys(preds).filter(m => preds[m] && preds[m].home !== '' && preds[m].home != null).length;
-  return { pts, exact, winner, total, predCount };
+  return { pts, exact, winner, total, predCount, podiumPts };
 }
 
 // ========================
@@ -1136,10 +1167,12 @@ function renderPredictions() {
       <button onclick="backToPlayerList()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;">‹ Volver</button>
       <div>
         <div style="font-size:17px;font-weight:800;color:var(--accent);">${player}</div>
-        <div style="font-size:12px;color:var(--muted);">${stats.pts} pts · ${stats.predCount} predicciones</div>
+        <div style="font-size:12px;color:var(--muted);">${stats.pts} pts · ${stats.predCount} predicciones${stats.podiumPts ? ` · 🏆 +${stats.podiumPts} podio` : ''}</div>
       </div>
     </div>
   `;
+
+  renderPodiumSection(player);
 
   const search = document.getElementById('pred-search')?.value?.toLowerCase() || '';
   let matches = [...MATCHES_DATA];
@@ -1210,6 +1243,87 @@ function renderPredictions() {
     </div>`;
   }).join('');
 }
+
+function saveRealPodium(key, value) {
+  if (!state.realPodium) state.realPodium = {};
+  state.realPodium[key] = value;
+  saveState();
+  showToast('✓ Podio real actualizado');
+  renderStandings();
+  renderAdmin();
+}
+
+function renderPodiumSection(player) {
+  const container = document.getElementById('podium-section');
+  const pick = state.podium[player] || {};
+  const isLocked = !!state.podiumLocked[player];
+  const allTeams = Object.keys(FLAGS).sort();
+
+  function teamOptions(selected) {
+    return `<option value="">-- Elige equipo --</option>` +
+      allTeams.map(t => `<option value="${t}" ${selected===t?'selected':''}>${FLAGS[t]} ${t}</option>`).join('');
+  }
+
+  const fields = [
+    { key: 'campeon', label: '🥇 Campeón', pts: '+3' },
+    { key: 'subcampeon', label: '🥈 Subcampeón', pts: '+3' },
+    { key: 'tercero', label: '🥉 Tercer puesto', pts: '+3' },
+    { key: 'cuarto', label: '4️⃣ Cuarto puesto', pts: '+3' },
+  ];
+
+  const hasAnyPick = fields.some(f => pick[f.key]);
+  const real = state.realPodium || {};
+  const realComplete = real.campeon && real.subcampeon && real.tercero && real.cuarto;
+
+  container.innerHTML = `
+    <div style="background:var(--surface);border:1px solid ${isLocked?'var(--green)':'var(--accent)'};border-radius:var(--radius);padding:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:14px;font-weight:800;color:var(--accent);">🏆 Mi Podio Final</div>
+        ${isLocked ? '<span style="font-size:11px;color:var(--green);font-weight:700;">🔒 Guardado</span>' : '<span style="font-size:10px;color:var(--muted);">3 pts por cada acierto exacto</span>'}
+      </div>
+      ${fields.map(f => {
+        const correct = realComplete && pick[f.key] && real[f.key] === pick[f.key];
+        return `<div style="margin-bottom:8px;">
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">${f.label} <span style="color:var(--accent);">(${f.pts})</span> ${correct ? '<span style="color:var(--green);font-weight:700;">✓ +3</span>' : ''}</label>
+          <select id="podium-${f.key}" ${isLocked?'disabled':''} onchange="savePodiumPick('${player}','${f.key}',this.value)"
+            style="width:100%;background:${isLocked?'#fff':'var(--surface2)'};color:${isLocked?'#111':'var(--text)'};border:1px solid var(--border);padding:10px;border-radius:6px;font-size:14px;${isLocked?'font-weight:700;':''}">
+            ${teamOptions(pick[f.key])}
+          </select>
+        </div>`;
+      }).join('')}
+      ${!isLocked && hasAnyPick ? `<button class="btn btn-primary" style="width:100%;margin-top:6px;" onclick="lockPodium('${player}')">🔒 Guardar mi podio</button>` : ''}
+      ${isLocked && !realComplete ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);">⏳ Tu podio está guardado. Los puntos se evaluarán cuando el Mundial defina semifinales, 3er puesto y la final.</div>` : ''}
+      ${realComplete ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);">
+        Podio real: ${FLAGS[real.campeon]||''} ${real.campeon} · ${FLAGS[real.subcampeon]||''} ${real.subcampeon} · ${FLAGS[real.tercero]||''} ${real.tercero} · ${FLAGS[real.cuarto]||''} ${real.cuarto}
+      </div>` : ''}
+    </div>
+  `;
+}
+
+function savePodiumPick(player, key, value) {
+  if (!state.podium[player]) state.podium[player] = {};
+  state.podium[player][key] = value;
+  saveState();
+  renderPodiumSection(player);
+}
+
+function lockPodium(player) {
+  if (!confirm(`¿Guardar y bloquear el podio de ${player}? No podrás cambiarlo después.`)) return;
+  state.podiumLocked[player] = true;
+  saveState();
+  showToast('🔒 Podio guardado');
+  renderPredictions();
+}
+
+function unlockPodium(player) {
+  if (!confirm(`¿Desbloquear el podio de ${player}?`)) return;
+  delete state.podiumLocked[player];
+  saveState();
+  showToast('✓ Podio desbloqueado');
+  renderPredictions();
+  if (document.getElementById('tab-admin')?.classList.contains('active')) renderAdmin();
+}
+
 
 function lockMatch(player, matchId) {
   if (!state.locked[player]) state.locked[player] = {};
@@ -1306,6 +1420,27 @@ function clearResult() {
 // ADMIN
 // ========================
 function renderAdmin() {
+  // Real podium form
+  const podiumForm = document.getElementById('real-podium-form');
+  const allTeams = Object.keys(FLAGS).sort();
+  const real = state.realPodium || {};
+  function teamOpts(selected) {
+    return `<option value="">-- Sin definir --</option>` +
+      allTeams.map(t => `<option value="${t}" ${selected===t?'selected':''}>${FLAGS[t]} ${t}</option>`).join('');
+  }
+  podiumForm.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div><label style="font-size:11px;color:var(--muted);">🥇 Campeón</label>
+        <select onchange="saveRealPodium('campeon',this.value)" class="form-input" style="width:100%;">${teamOpts(real.campeon)}</select></div>
+      <div><label style="font-size:11px;color:var(--muted);">🥈 Subcampeón</label>
+        <select onchange="saveRealPodium('subcampeon',this.value)" class="form-input" style="width:100%;">${teamOpts(real.subcampeon)}</select></div>
+      <div><label style="font-size:11px;color:var(--muted);">🥉 Tercer puesto</label>
+        <select onchange="saveRealPodium('tercero',this.value)" class="form-input" style="width:100%;">${teamOpts(real.tercero)}</select></div>
+      <div><label style="font-size:11px;color:var(--muted);">4️⃣ Cuarto puesto</label>
+        <select onchange="saveRealPodium('cuarto',this.value)" class="form-input" style="width:100%;">${teamOpts(real.cuarto)}</select></div>
+    </div>
+  `;
+
   // Lock admin - collapsible accordion per player
   const lockList = document.getElementById('lock-admin-list');
   lockList.innerHTML = PLAYERS.map((p, idx) => {
