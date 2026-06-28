@@ -246,6 +246,7 @@
       <div>
         <div style="font-size:22px; font-weight:800; color:var(--text);">Tabla de Posiciones</div>
         <div style="font-size:13px; color:var(--muted); margin-top:2px;">Resultado Exacto = <strong style="color:var(--accent)">2pts</strong> · Ganador Correcto = <strong style="color:var(--blue)">1pt</strong> · 🏆 Podio Final = <strong style="color:var(--accent)">+3pts</strong> c/u <span style="color:var(--muted);">(se evalúa al definirse semifinales)</span></div>
+        <div style="font-size:11px; color:var(--muted); margin-top:2px;">🎯 Desde 16avos: el marcador cubre hasta los 120 min. Si aciertas que un partido se va a <strong style="color:var(--text2);">penales</strong>, ganas 2 pts automáticos.</div>
       </div>
       <div id="total-matches-played" style="font-size:13px; color:var(--muted);"></div>
     </div>
@@ -632,8 +633,25 @@ function saveState() {
 // SCORING
 // ========================
 function calcPoints(pred, result) {
-  if (!pred || pred.home === '' || pred.away === '' || pred.home == null || pred.away == null) return null;
+  if (!pred) return null;
   if (!result || result.home === undefined) return null;
+
+  // Caso: el partido se decidió por penales (empate en 120 min)
+  if (result.wentToPenalties) {
+    // Si el jugador marcó "va a penales", acierta automáticamente con 2 pts
+    if (pred.predictsPenalties) return 2;
+    // Si no marcó penales pero su marcador coincide con el empate de 120 min, le da el punto de ganador/empate normal
+    if (pred.home === '' || pred.away === '' || pred.home == null || pred.away == null) return null;
+    const ph = parseInt(pred.home), pa = parseInt(pred.away);
+    const rh = parseInt(result.home), ra = parseInt(result.away);
+    if (ph === rh && pa === ra) return 2; // acertó el marcador exacto de los 120 min (empate)
+    return 0; // no marcó penales y no acertó el resultado de los 120 min
+  }
+
+  // Si el jugador marcó "va a penales" pero el partido NO llegó a penales, no suma puntos por esa marca
+  if (pred.predictsPenalties) return 0;
+
+  if (pred.home === '' || pred.away === '' || pred.home == null || pred.away == null) return null;
   const ph = parseInt(pred.home), pa = parseInt(pred.away);
   const rh = parseInt(result.home), ra = parseInt(result.away);
   if (ph === rh && pa === ra) return 2;
@@ -1205,7 +1223,8 @@ function renderPredictions() {
     const flagH = FLAGS[m.home] || '🏳️';
     const flagA = FLAGS[m.away] || '🏳️';
     const isMatchLocked = !!lockedMatches[m.id];
-    const hasAnyValue = (pred.home !== '' && pred.home != null) || (pred.away !== '' && pred.away != null);
+    const isKnockout = m.phase === 'knockout';
+    const hasAnyValue = (pred.home !== '' && pred.home != null) || (pred.away !== '' && pred.away != null) || pred.predictsPenalties;
 
     let ptsHtml = '';
     if (result) {
@@ -1216,6 +1235,7 @@ function renderPredictions() {
 
     const inputStyle = isMatchLocked ? 'style="cursor:not-allowed;background:#fff;color:#111;font-weight:800;border:2px solid var(--green);"' : '';
     const disabledAttr = isMatchLocked ? 'disabled' : '';
+    const penaltiesChecked = pred.predictsPenalties ? 'checked' : '';
 
     return `<div class="pred-match-card" id="pred-card-${m.id}" style="${isMatchLocked ? 'border-left:3px solid var(--green);' : ''}">
       <div class="pred-match-header">
@@ -1230,17 +1250,22 @@ function renderPredictions() {
           <span style="font-size:24px;">${flagH}</span>
           <span style="font-size:15px;font-weight:600;flex:1;">${m.home}</span>
           <input class="pred-input" type="number" min="0" max="20" value="${pred.home??''}" placeholder="-"
-            ${inputStyle} ${disabledAttr}
+            ${inputStyle} ${disabledAttr} ${pred.predictsPenalties ? 'disabled style="opacity:0.4;"' : ''}
             ${isMatchLocked ? '' : `oninput="savePred('${player}',${m.id},'home',this.value)"`} />
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:24px;">${flagA}</span>
           <span style="font-size:15px;font-weight:600;flex:1;">${m.away}</span>
           <input class="pred-input" type="number" min="0" max="20" value="${pred.away??''}" placeholder="-"
-            ${inputStyle} ${disabledAttr}
+            ${inputStyle} ${disabledAttr} ${pred.predictsPenalties ? 'disabled style="opacity:0.4;"' : ''}
             ${isMatchLocked ? '' : `oninput="savePred('${player}',${m.id},'away',this.value)"`} />
         </div>
-        ${result ? `<div style="font-size:11px;color:var(--muted);text-align:right;">Resultado real: ${result.home}-${result.away}</div>` : ''}
+        ${isKnockout ? `<label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-top:4px;cursor:${isMatchLocked?'not-allowed':'pointer'};">
+          <input type="checkbox" ${penaltiesChecked} ${isMatchLocked?'disabled':''}
+            onchange="savePredPenalties('${player}',${m.id},this.checked)" style="width:18px;height:18px;" />
+          🎯 Creo que este partido se va a penales (marcador opcional arriba)
+        </label>` : ''}
+        ${result ? `<div style="font-size:11px;color:var(--muted);text-align:right;">Resultado real: ${result.home}-${result.away}${result.wentToPenalties ? ' (penales) 🎯' : ''}</div>` : ''}
         ${!isMatchLocked && hasAnyValue
           ? `<button id="save-btn-${m.id}" class="btn btn-primary" style="width:100%;margin-top:4px;" onclick="lockMatch('${player}',${m.id})">🔒 Guardar pronóstico</button>`
           : ''}
@@ -1335,6 +1360,15 @@ function lockMatch(player, matchId) {
   state.locked[player][matchId] = true;
   saveState();
   showToast('🔒 Pronóstico guardado y bloqueado');
+  renderPredictions();
+}
+
+function savePredPenalties(player, matchId, checked) {
+  if (state.locked[player]?.[matchId]) return;
+  if (!state.predictions[player]) state.predictions[player] = {};
+  if (!state.predictions[player][matchId]) state.predictions[player][matchId] = {};
+  state.predictions[player][matchId].predictsPenalties = checked;
+  saveState();
   renderPredictions();
 }
 
@@ -1509,6 +1543,7 @@ function renderAdmin() {
     const flagH = FLAGS[m.home] || '🏳️';
     const flagA = FLAGS[m.away] || '🏳️';
     const hasResult = r.home !== undefined && r.away !== undefined;
+    const isKnockout = m.phase === 'knockout';
     return `<div class="result-match-card" style="${hasResult ? 'border-left:3px solid var(--green);' : ''}">
       <div class="result-date">P${m.id} · ${m.date}</div>
       <div class="result-teams">${flagH} ${m.home}</div>
@@ -1520,9 +1555,22 @@ function renderAdmin() {
           onchange="updateResult(${m.id},'away',this.value)" />
       </div>
       <div class="result-teams">${m.away} ${flagA}</div>
+      ${isKnockout ? `<label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);cursor:pointer;">
+        <input type="checkbox" ${r.wentToPenalties?'checked':''} onchange="updateResultPenalties(${m.id},this.checked)" style="width:15px;height:15px;" />
+        🎯 Penales
+      </label>` : ''}
       ${hasResult ? '<span style="color:var(--green);font-size:12px;">✓</span>' : ''}
     </div>`;
   }).join('');
+}
+
+function updateResultPenalties(matchId, checked) {
+  if (!state.results[matchId]) state.results[matchId] = {};
+  state.results[matchId].wentToPenalties = checked;
+  saveState();
+  showToast(checked ? `P${matchId} marcado: fue a penales 🎯` : `P${matchId}: penales desmarcado`);
+  renderStandings();
+  renderGrupos();
 }
 
 function updateResult(matchId, side, val) {
