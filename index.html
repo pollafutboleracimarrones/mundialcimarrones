@@ -541,7 +541,7 @@ const MATCHES_DATA = [
   {id:71, date:'Jun 27', time:'4:00pm', home:'Croacia', away:'Ghana', group:'L', phase:'groups'},
   {id:72, date:'Jun 27', time:'4:00pm', home:'Panamá', away:'Inglaterra', group:'L', phase:'groups'},
   // 16AVOS DE FINAL
-  {id:73, date:'Jun 28', time:'2:00pm', home:'Sudáfrica', away:'Canadá', group:'16avos', phase:'knockout'},
+  {id:73, date:'Jun 28', time:'1:00pm', home:'Sudáfrica', away:'Canadá', group:'16avos', phase:'knockout'},
   {id:74, date:'Jun 29', time:'12:00pm', home:'Brasil', away:'Japón', group:'16avos', phase:'knockout'},
   {id:75, date:'Jun 29', time:'3:30pm', home:'Alemania', away:'Paraguay', group:'16avos', phase:'knockout'},
   {id:76, date:'Jun 29', time:'8:00pm', home:'Países Bajos', away:'Marruecos', group:'16avos', phase:'knockout'},
@@ -549,12 +549,12 @@ const MATCHES_DATA = [
   {id:78, date:'Jun 30', time:'4:00pm', home:'Francia', away:'Suecia', group:'16avos', phase:'knockout'},
   {id:79, date:'Jun 30', time:'8:00pm', home:'México', away:'Ecuador', group:'16avos', phase:'knockout'},
   {id:80, date:'Jul 1', time:'11:00am', home:'Inglaterra', away:'RD de Congo', group:'16avos', phase:'knockout'},
-  {id:81, date:'Jul 1', time:'2:00pm', home:'Egipto', away:'Corea del Sur', group:'16avos', phase:'knockout'},
-  {id:82, date:'Jul 1', time:'5:00pm', home:'Bélgica', away:'3º mejor', group:'16avos', phase:'knockout'},
+  {id:81, date:'Jul 1', time:'1:00pm', home:'Australia', away:'Egipto', group:'16avos', phase:'knockout'},
+  {id:82, date:'Jul 1', time:'2:00pm', home:'Bélgica', away:'Corea del Sur', group:'16avos', phase:'knockout'},
   {id:83, date:'Jul 1', time:'7:00pm', home:'Estados Unidos', away:'Bosnia y Herzegovina', group:'16avos', phase:'knockout'},
-  {id:84, date:'Jul 2', time:'4:00pm', home:'Portugal', away:'Croacia', group:'16avos', phase:'knockout'},
+  {id:84, date:'Jul 2', time:'6:00pm', home:'Portugal', away:'Croacia', group:'16avos', phase:'knockout'},
   {id:85, date:'Jul 2', time:'9:00pm', home:'España', away:'Austria', group:'16avos', phase:'knockout'},
-  {id:86, date:'Jul 2', time:'10:00pm', home:'Suiza', away:'Irán', group:'16avos', phase:'knockout'},
+  {id:86, date:'Jul 2', time:'10:00pm', home:'Suiza', away:'Argelia', group:'16avos', phase:'knockout'},
   {id:87, date:'Jul 3', time:'5:00pm', home:'Argentina', away:'Cabo Verde', group:'16avos', phase:'knockout'},
   {id:88, date:'Jul 3', time:'8:30pm', home:'Colombia', away:'Ghana', group:'16avos', phase:'knockout'},
   // OCTAVOS DE FINAL
@@ -567,15 +567,15 @@ const MATCHES_DATA = [
   {id:95, date:'Jul 6', time:'2:00pm', home:'G. P85', away:'G. P86', group:'Octavos', phase:'knockout'},
   {id:96, date:'Jul 6', time:'6:00pm', home:'G. P87', away:'G. P88', group:'Octavos', phase:'knockout'},
   // CUARTOS DE FINAL
-  {id:97, date:'Jul 8', time:'2:00pm', home:'G. P89', away:'G. P90', group:'Cuartos', phase:'knockout'},
-  {id:98, date:'Jul 8', time:'6:00pm', home:'G. P91', away:'G. P92', group:'Cuartos', phase:'knockout'},
-  {id:99, date:'Jul 9', time:'2:00pm', home:'G. P93', away:'G. P94', group:'Cuartos', phase:'knockout'},
-  {id:100, date:'Jul 9', time:'6:00pm', home:'G. P95', away:'G. P96', group:'Cuartos', phase:'knockout'},
+  {id:97, date:'Jul 9', time:'2:00pm', home:'G. P89', away:'G. P90', group:'Cuartos', phase:'knockout'},
+  {id:98, date:'Jul 10', time:'1:00pm', home:'G. P91', away:'G. P92', group:'Cuartos', phase:'knockout'},
+  {id:99, date:'Jul 11', time:'3:00pm', home:'G. P93', away:'G. P94', group:'Cuartos', phase:'knockout'},
+  {id:100, date:'Jul 12', time:'7:00pm', home:'G. P95', away:'G. P96', group:'Cuartos', phase:'knockout'},
   // SEMIFINALES
-  {id:101, date:'Jul 12', time:'2:00pm', home:'G. P97', away:'G. P98', group:'Semifinales', phase:'knockout'},
-  {id:102, date:'Jul 14', time:'2:00pm', home:'G. P99', away:'G. P100', group:'Semifinales', phase:'knockout'},
+  {id:101, date:'Jul 14', time:'3:00pm', home:'G. P97', away:'G. P98', group:'Semifinales', phase:'knockout'},
+  {id:102, date:'Jul 15', time:'3:00pm', home:'G. P99', away:'G. P100', group:'Semifinales', phase:'knockout'},
   // TERCER PUESTO
-  {id:103, date:'Jul 17', time:'2:00pm', home:'Perd. P101', away:'Perd. P102', group:'Tercer Puesto', phase:'knockout'},
+  {id:103, date:'Jul 18', time:'4:00pm', home:'Perd. P101', away:'Perd. P102', group:'Tercer Puesto', phase:'knockout'},
   // FINAL
   {id:104, date:'Jul 19', time:'2:00pm', home:'G. P101', away:'G. P102', group:'FINAL 🏆', phase:'knockout'}
 ];
@@ -737,8 +737,8 @@ function renderLastMatches() {
   }
 
   // Group by date, newest first
-  const DATE_ORDER = ['Jun 11','Jun 12','Jun 13','Jun 14','Jun 15','Jun 16','Jun 17','Jun 18','Jun 19','Jun 20','Jun 21','Jun 22','Jun 23','Jun 24','Jun 25','Jun 26','Jun 27','Jul 1','Jul 2','Jul 3','Jul 4','Jul 5','Jul 6','Jul 7','Jul 8','Jul 9','Jul 10','Jul 12','Jul 14','Jul 17','Jul 19'];
-    const DATE_LABELS_R = {'Jun 11':'Jueves 11 de Junio','Jun 12':'Viernes 12 de Junio','Jun 13':'Sábado 13 de Junio','Jun 14':'Domingo 14 de Junio','Jun 15':'Lunes 15 de Junio','Jun 16':'Martes 16 de Junio','Jun 17':'Miércoles 17 de Junio','Jun 18':'Jueves 18 de Junio','Jun 19':'Viernes 19 de Junio','Jun 20':'Sábado 20 de Junio','Jun 21':'Domingo 21 de Junio','Jun 22':'Lunes 22 de Junio','Jun 23':'Martes 23 de Junio','Jun 24':'Miércoles 24 de Junio','Jun 25':'Jueves 25 de Junio','Jun 26':'Viernes 26 de Junio','Jun 27':'Sábado 27 de Junio','Jul 1':'Miércoles 1 de Julio','Jul 2':'Jueves 2 de Julio','Jul 3':'Viernes 3 de Julio','Jul 4':'Sábado 4 de Julio','Jul 5':'Domingo 5 de Julio','Jul 6':'Lunes 6 de Julio','Jul 7':'Martes 7 de Julio','Jul 8':'Miércoles 8 de Julio','Jul 9':'Jueves 9 de Julio','Jul 10':'Viernes 10 de Julio','Jul 12':'Domingo 12 de Julio','Jul 14':'Martes 14 de Julio','Jul 17':'Viernes 17 de Julio','Jul 19':'Domingo 19 de Julio'};
+  const DATE_ORDER = ['Jun 11','Jun 12','Jun 13','Jun 14','Jun 15','Jun 16','Jun 17','Jun 18','Jun 19','Jun 20','Jun 21','Jun 22','Jun 23','Jun 24','Jun 25','Jun 26','Jun 27','Jun 28','Jun 29','Jun 30','Jul 1','Jul 2','Jul 3','Jul 4','Jul 5','Jul 6','Jul 7','Jul 8','Jul 9','Jul 10','Jul 12','Jul 14','Jul 17','Jul 19'];
+    const DATE_LABELS_R = {'Jun 11':'Jueves 11 de Junio','Jun 12':'Viernes 12 de Junio','Jun 13':'Sábado 13 de Junio','Jun 14':'Domingo 14 de Junio','Jun 15':'Lunes 15 de Junio','Jun 16':'Martes 16 de Junio','Jun 17':'Miércoles 17 de Junio','Jun 18':'Jueves 18 de Junio','Jun 19':'Viernes 19 de Junio','Jun 20':'Sábado 20 de Junio','Jun 21':'Domingo 21 de Junio','Jun 22':'Lunes 22 de Junio','Jun 23':'Martes 23 de Junio','Jun 24':'Miércoles 24 de Junio','Jun 25':'Jueves 25 de Junio','Jun 26':'Viernes 26 de Junio','Jun 27':'Sábado 27 de Junio','Jun 28':'Domingo 28 de Junio','Jun 29':'Lunes 29 de Junio','Jun 30':'Martes 30 de Junio','Jul 1':'Miércoles 1 de Julio','Jul 2':'Jueves 2 de Julio','Jul 3':'Viernes 3 de Julio','Jul 4':'Sábado 4 de Julio','Jul 5':'Domingo 5 de Julio','Jul 6':'Lunes 6 de Julio','Jul 7':'Martes 7 de Julio','Jul 8':'Miércoles 8 de Julio','Jul 9':'Jueves 9 de Julio','Jul 10':'Viernes 10 de Julio','Jul 12':'Domingo 12 de Julio','Jul 14':'Martes 14 de Julio','Jul 17':'Viernes 17 de Julio','Jul 19':'Domingo 19 de Julio'};
 
   const byDate = {};
   finished.forEach(m => {
@@ -1080,7 +1080,7 @@ function renderMatches() {
     'Jul 19': 'Domingo 19 de Julio',
   };
 
-  const DATE_ORDER = ['Jun 11','Jun 12','Jun 13','Jun 14','Jun 15','Jun 16','Jun 17','Jun 18','Jun 19','Jun 20','Jun 21','Jun 22','Jun 23','Jun 24','Jun 25','Jun 26','Jun 27','Jul 1','Jul 2','Jul 3','Jul 4','Jul 5','Jul 6','Jul 7','Jul 8','Jul 9','Jul 10','Jul 12','Jul 14','Jul 17','Jul 19'];
+  const DATE_ORDER = ['Jun 11','Jun 12','Jun 13','Jun 14','Jun 15','Jun 16','Jun 17','Jun 18','Jun 19','Jun 20','Jun 21','Jun 22','Jun 23','Jun 24','Jun 25','Jun 26','Jun 27','Jun 28','Jun 29','Jun 30','Jul 1','Jul 2','Jul 3','Jul 4','Jul 5','Jul 6','Jul 7','Jul 8','Jul 9','Jul 10','Jul 12','Jul 14','Jul 17','Jul 19'];
 
   matches.sort((a, b) => {
     const di = DATE_ORDER.indexOf(a.date) - DATE_ORDER.indexOf(b.date);
