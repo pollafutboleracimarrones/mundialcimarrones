@@ -695,9 +695,13 @@ function getPlayerStats(player) {
   const podiumPts = getPodiumPoints(player);
   pts += podiumPts;
 
-  // Una predicción cuenta como "ingresada" si tiene marcador, O si marcó "va a penales"
-  const predCount = Object.keys(preds).filter(m => {
-    const p = preds[m];
+  // Una predicción cuenta como "ingresada" si tiene marcador, marcó "va a penales", O está bloqueada (guardada por el jugador, aunque sin marcador por falta de tiempo)
+  const playerLocked = state.locked[player] || {};
+  const allRelevantIds = new Set([...Object.keys(preds), ...Object.keys(playerLocked)]);
+  const predCount = [...allRelevantIds].filter(mid => {
+    const p = preds[mid];
+    const isLocked = !!playerLocked[mid];
+    if (isLocked) return true; // guardado/bloqueado siempre cuenta, tenga o no marcador
     if (!p) return false;
     const hasScore = p.home !== '' && p.home != null;
     return hasScore || p.predictsPenalties;
@@ -1221,8 +1225,17 @@ function renderPredictions() {
     return timeToMinutes(a.time) - timeToMinutes(b.time);
   });
 
-  if (currentPredFilter === 'pending') matches = matches.filter(m => { const p = preds[m.id]; return !p || p.home == null || p.home === '' || p.away == null || p.away === ''; });
-  if (currentPredFilter === 'scored') matches = matches.filter(m => { const p = preds[m.id]; return p && p.home !== '' && p.home != null && p.away !== '' && p.away != null; });
+  function isEntered(m) {
+    const p = preds[m.id];
+    const isLocked = !!lockedMatches[m.id];
+    if (isLocked) return true; // bloqueado = predicción ingresada, aunque sin marcador
+    if (!p) return false;
+    const hasScore = p.home !== '' && p.home != null && p.away !== '' && p.away != null;
+    return hasScore || p.predictsPenalties;
+  }
+
+  if (currentPredFilter === 'pending') matches = matches.filter(m => !isEntered(m));
+  if (currentPredFilter === 'scored') matches = matches.filter(m => isEntered(m));
   if (search) matches = matches.filter(m => m.home.toLowerCase().includes(search) || m.away.toLowerCase().includes(search));
 
   const container = document.getElementById('pred-list');
