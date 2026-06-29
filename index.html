@@ -633,15 +633,14 @@ function saveState() {
 // SCORING
 // ========================
 function calcPoints(pred, result) {
-  if (!pred) return null;
-  if (!result || result.home === undefined) return null;
+  if (!result || result.home === undefined) return null; // el partido aún no tiene resultado real
 
   // Caso: el partido se decidió por penales (empate en 120 min)
   if (result.wentToPenalties) {
     // Si el jugador marcó "va a penales", acierta automáticamente con 2 pts
-    if (pred.predictsPenalties) return 2;
-    // Si no marcó penales pero su marcador coincide con el empate de 120 min, le da el punto de ganador/empate normal
-    if (pred.home === '' || pred.away === '' || pred.home == null || pred.away == null) return null;
+    if (pred && pred.predictsPenalties) return 2;
+    // Si no marcó penales pero su marcador coincide con el empate de 120 min, le da el punto exacto
+    if (!pred || pred.home === '' || pred.away === '' || pred.home == null || pred.away == null) return 0; // no predijo nada = 0 pts, pero evaluado
     const ph = parseInt(pred.home), pa = parseInt(pred.away);
     const rh = parseInt(result.home), ra = parseInt(result.away);
     if (ph === rh && pa === ra) return 2; // acertó el marcador exacto de los 120 min (empate)
@@ -649,9 +648,9 @@ function calcPoints(pred, result) {
   }
 
   // Si el jugador marcó "va a penales" pero el partido NO llegó a penales, no suma puntos por esa marca
-  if (pred.predictsPenalties) return 0;
+  if (pred && pred.predictsPenalties) return 0;
 
-  if (pred.home === '' || pred.away === '' || pred.home == null || pred.away == null) return null;
+  if (!pred || pred.home === '' || pred.away === '' || pred.home == null || pred.away == null) return 0; // sin predicción = 0 pts, pero evaluado
   const ph = parseInt(pred.home), pa = parseInt(pred.away);
   const rh = parseInt(result.home), ra = parseInt(result.away);
   if (ph === rh && pa === ra) return 2;
@@ -678,19 +677,32 @@ function getPodiumPoints(player) {
 function getPlayerStats(player) {
   let pts = 0, exact = 0, winner = 0, total = 0;
   const preds = state.predictions[player] || {};
-  for (const mid in preds) {
-    const result = state.results[mid];
-    if (!result) continue;
-    const p = calcPoints(preds[mid], result);
-    if (p === null) continue;
+
+  // Iterar sobre TODOS los partidos con resultado real, no solo los que el jugador predijo.
+  // Así, si a alguien se le olvidó pronosticar, igual cuenta como "evaluado" (con 0 puntos).
+  MATCHES_DATA.forEach(m => {
+    const result = state.results[m.id];
+    if (!result) return; // el partido aún no se ha jugado, no se evalúa
     total++;
+    const pred = preds[m.id];
+    const p = calcPoints(pred, result); // calcPoints ya maneja pred undefined/vacío como 0 o null según corresponda
+    if (p === null || p === undefined) return; // sin predicción válida = 0 implícito, no suma pts
     pts += p;
     if (p === 2) exact++;
     if (p === 1) winner++;
-  }
+  });
+
   const podiumPts = getPodiumPoints(player);
   pts += podiumPts;
-  const predCount = Object.keys(preds).filter(m => preds[m] && preds[m].home !== '' && preds[m].home != null).length;
+
+  // Una predicción cuenta como "ingresada" si tiene marcador, O si marcó "va a penales"
+  const predCount = Object.keys(preds).filter(m => {
+    const p = preds[m];
+    if (!p) return false;
+    const hasScore = p.home !== '' && p.home != null;
+    return hasScore || p.predictsPenalties;
+  }).length;
+
   return { pts, exact, winner, total, predCount, podiumPts };
 }
 
