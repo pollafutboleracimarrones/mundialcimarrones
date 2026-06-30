@@ -787,7 +787,7 @@ function renderLastMatches() {
             else if (pts === 1) { bg='var(--blue)';     icon='✓';  color='#fff'; }
             else if (pts === 0) { bg='#ef4444';          icon='✗';  color='#fff'; }
             else                { bg='var(--surface2)';  icon='–';  color='var(--muted)'; }
-            return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+            return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;" onclick="goToPlayerPrediction('${p}',${m.id})">
               <div style="background:${bg};color:${color};font-size:9px;font-weight:800;padding:3px 5px;border-radius:4px;min-width:30px;text-align:center;line-height:1.2;">${ini}<br/>${icon}</div>
             </div>`;
           }).join('');
@@ -1174,6 +1174,42 @@ function selectPlayer(name) {
   document.getElementById('pred-player-select').style.display = 'none';
   document.getElementById('pred-player-view').style.display = 'block';
   renderPredictions();
+}
+
+function goToPlayerPrediction(player, matchId) {
+  // Cambiar a la pestaña de Predicciones manualmente (sin depender de event.target)
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-predicciones').classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.getAttribute('onclick')?.includes("'predicciones'")) b.classList.add('active');
+  });
+
+  state.selectedPlayer = player;
+  currentPredFilter = 'all';
+  document.getElementById('pred-player-select').style.display = 'none';
+  document.getElementById('pred-player-view').style.display = 'block';
+  renderPredictions();
+
+  // Asegurar que el filtro visual muestre "Todos" como activo
+  setTimeout(() => {
+    document.querySelectorAll('#pred-player-view .filter-btn').forEach(b => b.classList.remove('active'));
+    const allBtn = [...document.querySelectorAll('#pred-player-view .filter-btn')].find(b => b.textContent.trim() === 'Todos');
+    if (allBtn) allBtn.classList.add('active');
+    const searchInput = document.getElementById('pred-search');
+    if (searchInput) searchInput.value = '';
+  }, 0);
+
+  // Esperar a que el DOM se actualice y luego hacer scroll + resaltar el partido
+  setTimeout(() => {
+    const card = document.getElementById(`pred-card-${matchId}`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.style.transition = 'box-shadow 0.3s';
+      card.style.boxShadow = '0 0 0 3px var(--accent)';
+      setTimeout(() => { card.style.boxShadow = ''; }, 2500);
+    }
+  }, 150);
 }
 
 function backToPlayerList() {
