@@ -640,12 +640,13 @@ function calcPoints(pred, result) {
   if (result.wentToPenalties) {
     // Si el jugador marcó "va a penales", acierta automáticamente con 2 pts
     if (pred && pred.predictsPenalties) return 2;
-    // Si no marcó penales pero su marcador coincide con el empate de 120 min, le da el punto exacto
+    // Si no marcó penales, se evalúa su marcador normal contra el resultado de los 120 min (que fue empate)
     if (!pred || pred.home === '' || pred.away === '' || pred.home == null || pred.away == null) return 0; // no predijo nada = 0 pts, pero evaluado
     const ph = parseInt(pred.home), pa = parseInt(pred.away);
     const rh = parseInt(result.home), ra = parseInt(result.away);
-    if (ph === rh && pa === ra) return 2; // acertó el marcador exacto de los 120 min (empate)
-    return 0; // no marcó penales y no acertó el resultado de los 120 min
+    if (ph === rh && pa === ra) return 2; // acertó el marcador exacto de los 120 min
+    if (ph === pa) return 1; // predijo empate (cualquier marcador), y el resultado real de 120 min también fue empate
+    return 0; // no marcó penales y no acertó ni el marcador ni que fuera empate
   }
 
   // Si el jugador marcó "va a penales" pero el partido NO llegó a penales, no suma puntos por esa marca
@@ -1769,6 +1770,11 @@ async function syncResults() {
 
       if (homeScore == null || awayScore == null) return;
 
+      // Detectar si el partido se decidió por penales
+      const wentToPenalties = statusVal === 'ft_pen' ||
+        (apiMatch.home_pen != null && apiMatch.away_pen != null) ||
+        (apiMatch.home_score_pen != null && apiMatch.away_score_pen != null);
+
       let ourMatch = MATCHES_DATA.find(m => {
         if (!pendingIds.has(m.id)) return false; // skip matches we already have confirmed
         const h = normalize(m.home);
@@ -1794,9 +1800,9 @@ async function syncResults() {
       }
 
       if (ourMatch) {
-        state.results[ourMatch.id] = { home: finalHomeScore, away: finalAwayScore };
+        state.results[ourMatch.id] = { home: finalHomeScore, away: finalAwayScore, wentToPenalties };
         updated++;
-        log.push(`✓ P${ourMatch.id} ${ourMatch.home} ${finalHomeScore}-${finalAwayScore} ${ourMatch.away}`);
+        log.push(`✓ P${ourMatch.id} ${ourMatch.home} ${finalHomeScore}-${finalAwayScore} ${ourMatch.away}${wentToPenalties ? ' (penales 🎯)' : ''}`);
       }
     });
 
