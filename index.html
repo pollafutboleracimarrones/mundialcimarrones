@@ -1598,6 +1598,8 @@ function updateResultPenalties(matchId, checked) {
   showToast(checked ? `P${matchId} marcado: fue a penales 🎯` : `P${matchId}: penales desmarcado`);
   renderStandings();
   renderGrupos();
+  renderMatches();
+  if (document.getElementById('tab-predicciones')?.classList.contains('active')) renderPredictions();
 }
 
 function updateResult(matchId, side, val) {
