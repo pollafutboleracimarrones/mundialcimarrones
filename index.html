@@ -1100,25 +1100,26 @@ function renderMatches() {
 
   const DATE_ORDER = ['Jun 11','Jun 12','Jun 13','Jun 14','Jun 15','Jun 16','Jun 17','Jun 18','Jun 19','Jun 20','Jun 21','Jun 22','Jun 23','Jun 24','Jun 25','Jun 26','Jun 27','Jun 28','Jun 29','Jun 30','Jul 1','Jul 2','Jul 3','Jul 4','Jul 5','Jul 6','Jul 7','Jul 8','Jul 9','Jul 10','Jul 12','Jul 14','Jul 17','Jul 19'];
 
+  // Pending matches: earliest first. Played matches: most recent first. Pending always above played.
   matches.sort((a, b) => {
+    const aPlayed = !!state.results[a.id];
+    const bPlayed = !!state.results[b.id];
+    if (aPlayed !== bPlayed) return aPlayed ? 1 : -1; // pending first
     const di = DATE_ORDER.indexOf(a.date) - DATE_ORDER.indexOf(b.date);
-    if (di !== 0) return di;
-    return timeToMinutes(a.time) - timeToMinutes(b.time);
+    if (di !== 0) return aPlayed ? -di : di; // pending: earliest first; played: most recent first
+    const ti = timeToMinutes(a.time) - timeToMinutes(b.time);
+    return aPlayed ? -ti : ti;
   });
 
+  // Keep groups in the order matches were sorted (pending first, played after)
+  const seen = [];
   const groups = {};
   matches.forEach(m => {
     const gk = DATE_LABELS[m.date] || m.date;
-    if (!groups[gk]) groups[gk] = [];
+    if (!groups[gk]) { groups[gk] = []; seen.push(gk); }
     groups[gk].push(m);
   });
-
-  // Sort group keys by date order
-  const sortedGroups = Object.entries(groups).sort((a, b) => {
-    const dateA = Object.keys(DATE_LABELS).find(k => DATE_LABELS[k] === a[0]) || '';
-    const dateB = Object.keys(DATE_LABELS).find(k => DATE_LABELS[k] === b[0]) || '';
-    return DATE_ORDER.indexOf(dateA) - DATE_ORDER.indexOf(dateB);
-  });
+  const sortedGroups = seen.map(gk => [gk, groups[gk]]);
 
   const container = document.getElementById('matches-list');
   if (!sortedGroups.length) { container.innerHTML = '<div style="color:var(--muted);padding:40px;text-align:center;">No se encontraron partidos</div>'; return; }
