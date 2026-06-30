@@ -1802,6 +1802,9 @@ async function syncResults() {
       }
 
       if (ourMatch) {
+        const existing = state.results[ourMatch.id];
+        // No sobreescribir si ya existe un resultado guardado (p.ej. con wentToPenalties marcado manualmente)
+        if (existing) return;
         state.results[ourMatch.id] = { home: finalHomeScore, away: finalAwayScore, wentToPenalties };
         updated++;
         log.push(`✓ P${ourMatch.id} ${ourMatch.home} ${finalHomeScore}-${finalAwayScore} ${ourMatch.away}${wentToPenalties ? ' (penales 🎯)' : ''}`);
