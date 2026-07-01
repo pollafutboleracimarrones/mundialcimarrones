@@ -551,13 +551,13 @@ const MATCHES_DATA = [
   {id:79, date:'Jun 30', time:'8:00pm', home:'México', away:'Ecuador', group:'16avos', phase:'knockout'},
   {id:80, date:'Jul 1', time:'11:00am', home:'Inglaterra', away:'RD de Congo', group:'16avos', phase:'knockout'},
   {id:81, date:'Jul 1', time:'1:00pm', home:'Australia', away:'Egipto', group:'16avos', phase:'knockout'},
-  {id:82, date:'Jul 1', time:'2:00pm', home:'Bélgica', away:'Corea del Sur', group:'16avos', phase:'knockout'},
+  {id:82, date:'Jul 1', time:'3:00pm', home:'Bélgica', away:'Senegal', group:'16avos', phase:'knockout'},
   {id:83, date:'Jul 1', time:'7:00pm', home:'Estados Unidos', away:'Bosnia y Herzegovina', group:'16avos', phase:'knockout'},
-  {id:84, date:'Jul 2', time:'6:00pm', home:'Portugal', away:'Croacia', group:'16avos', phase:'knockout'},
-  {id:85, date:'Jul 2', time:'9:00pm', home:'España', away:'Austria', group:'16avos', phase:'knockout'},
+  {id:84, date:'Jul 2', time:'2:00pm', home:'Portugal', away:'Croacia', group:'16avos', phase:'knockout'},
+  {id:85, date:'Jul 2', time:'2:00pm', home:'España', away:'Austria', group:'16avos', phase:'knockout'},
   {id:86, date:'Jul 2', time:'10:00pm', home:'Suiza', away:'Argelia', group:'16avos', phase:'knockout'},
-  {id:87, date:'Jul 3', time:'5:00pm', home:'Argentina', away:'Cabo Verde', group:'16avos', phase:'knockout'},
-  {id:88, date:'Jul 3', time:'8:30pm', home:'Colombia', away:'Ghana', group:'16avos', phase:'knockout'},
+  {id:87, date:'Jul 3', time:'3:00pm', home:'Argentina', away:'Cabo Verde', group:'16avos', phase:'knockout'},
+  {id:88, date:'Jul 3', time:'7:00pm', home:'Colombia', away:'Ghana', group:'16avos', phase:'knockout'},
   // OCTAVOS DE FINAL
   {id:89, date:'Jul 4', time:'2:00pm', home:'G. P75', away:'G. P78', group:'Octavos', phase:'knockout'},
   {id:90, date:'Jul 4', time:'6:00pm', home:'G. P73', away:'G. P76', group:'Octavos', phase:'knockout'},
@@ -888,6 +888,34 @@ function getWinner(matchId) {
   if (!r) return null;
   const m = MATCHES_DATA.find(mm => mm.id === matchId);
   if (!m) return null;
+  // If went to penalties, winner is whoever won on penalties - we just use the stored result direction
+  const hg = parseInt(r.home), ag = parseInt(r.away);
+  if (hg > ag) return m.home;
+  if (ag > hg) return m.away;
+  // Draw in 120min - result doesn't tell us pen winner, skip for now (handled by sync)
+  return null;
+}
+
+function updateKnockoutNames() {
+  // Resolve all knockout placeholders in order (id 73-104)
+  const knockout = MATCHES_DATA.filter(m => m.phase === 'knockout').sort((a,b) => a.id - b.id);
+  knockout.forEach(m => {
+    ['home','away'].forEach(side => {
+      const val = m[side];
+      const winnerMatch = val && val.match(/^G\.\s*P(\d+)$/);
+      if (winnerMatch) {
+        const winner = getWinner(parseInt(winnerMatch[1]));
+        if (winner) m[side] = winner;
+      }
+    });
+  });
+}
+
+function renderGrupos() {
+  const r = state.results[matchId];
+  if (!r) return null;
+  const m = MATCHES_DATA.find(mm => mm.id === matchId);
+  if (!m) return null;
   const hg = parseInt(r.home), ag = parseInt(r.away);
   if (hg > ag) return m.home;
   if (ag > hg) return m.away;
@@ -1056,6 +1084,8 @@ function filterMatches(f, btn) {
 }
 
 function renderMatches() {
+  // Update knockout team names from bracket cascade before rendering
+  updateKnockoutNames();
   const search = document.getElementById('match-search')?.value?.toLowerCase() || '';
   let matches = MATCHES_DATA;
   if (currentMatchFilter === 'pending') matches = matches.filter(m => !state.results[m.id]);
@@ -1106,8 +1136,11 @@ function renderMatches() {
 
   const DATE_ORDER = ['Jun 11','Jun 12','Jun 13','Jun 14','Jun 15','Jun 16','Jun 17','Jun 18','Jun 19','Jun 20','Jun 21','Jun 22','Jun 23','Jun 24','Jun 25','Jun 26','Jun 27','Jun 28','Jun 29','Jun 30','Jul 1','Jul 2','Jul 3','Jul 4','Jul 5','Jul 6','Jul 7','Jul 8','Jul 9','Jul 10','Jul 11','Jul 12','Jul 14','Jul 15','Jul 17','Jul 18','Jul 19'];
 
-  // Today = Jun 30. Show pending/upcoming first (earliest first), then played (most recent first)
-  const TODAY_IDX = DATE_ORDER.indexOf('Jun 30');
+  // Dynamic today detection
+  const now = new Date();
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const todayKey = `${monthNames[now.getMonth()]} ${now.getDate()}`;
+  const TODAY_IDX = DATE_ORDER.indexOf(todayKey) >= 0 ? DATE_ORDER.indexOf(todayKey) : DATE_ORDER.length;
   matches.sort((a, b) => {
     const ai = DATE_ORDER.indexOf(a.date);
     const bi = DATE_ORDER.indexOf(b.date);
@@ -1870,7 +1903,7 @@ async function syncResults() {
       <pre id="raw-log" style="display:none;font-size:10px;color:var(--text);margin-top:6px;overflow:auto;max-height:250px;white-space:pre-wrap;background:var(--surface2);padding:8px;border-radius:6px;">${JSON.stringify(matches.filter(m=>m.status==='completed').slice(0,5), null, 2)}</pre>`;
 
     if (updated > 0) {
-      saveState(); renderMatches(); renderStandings(); renderGrupos(); renderAdmin();
+      saveState(); updateKnockoutNames(); renderMatches(); renderStandings(); renderGrupos(); renderAdmin();
       statusEl.innerHTML = `<span style="color:var(--green);">✓ ${updated} actualizado(s)</span>`;
       logEl.innerHTML = log.map(l=>`<div style="font-size:12px;">${l}</div>`).join('') +
         (noMatch.length ? `<div style="color:#ef4444;font-size:11px;margin-top:4px;">${noMatch.join('<br/>')}</div>` : '') + debugBtn;
