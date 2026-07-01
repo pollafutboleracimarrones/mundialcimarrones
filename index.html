@@ -814,6 +814,7 @@ function renderLastMatches() {
 // GRUPOS
 // ========================
 function renderGrupos() {
+  updateKnockoutNames(); // always update bracket cascade before rendering
   const container = document.getElementById('grupos-list');
   const groupStandings = {};
 
@@ -911,16 +912,16 @@ function getWinner(matchId) {
   if (!r) return null;
   const m = MATCHES_DATA.find(mm => mm.id === matchId);
   if (!m) return null;
-  // If went to penalties, winner is whoever won on penalties - we just use the stored result direction
   const hg = parseInt(r.home), ag = parseInt(r.away);
   if (hg > ag) return m.home;
   if (ag > hg) return m.away;
-  // Draw in 120min - result doesn't tell us pen winner, skip for now (handled by sync)
+  // Draw in 120min - check if there's a penalty winner stored
+  if (r.wentToPenalties && r.penWinner) return r.penWinner;
   return null;
 }
 
 function updateKnockoutNames() {
-  // Resolve all knockout placeholders in order (id 73-104)
+  // Resolve all knockout placeholders in order (id 73-104) - must run in order for cascade
   const knockout = MATCHES_DATA.filter(m => m.phase === 'knockout').sort((a,b) => a.id - b.id);
   knockout.forEach(m => {
     ['home','away'].forEach(side => {
@@ -1683,7 +1684,14 @@ function renderAdmin() {
       ${isKnockout ? `<label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);cursor:pointer;">
         <input type="checkbox" ${r.wentToPenalties?'checked':''} onchange="updateResultPenalties(${m.id},this.checked)" style="width:15px;height:15px;" />
         🎯 Penales
-      </label>` : ''}
+      </label>
+      ${r.wentToPenalties ? `<div style="margin-top:4px;font-size:11px;color:var(--text2);">Ganador penales:
+        <select onchange="updatePenWinner(${m.id},this.value)" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:3px 6px;border-radius:4px;font-size:11px;">
+          <option value="">-- Seleccionar --</option>
+          <option value="${m.home}" ${r.penWinner===m.home?'selected':''}>${FLAGS[m.home]||'🏳️'} ${m.home}</option>
+          <option value="${m.away}" ${r.penWinner===m.away?'selected':''}>${FLAGS[m.away]||'🏳️'} ${m.away}</option>
+        </select>
+      </div>` : ''}` : ''}
       ${hasResult ? '<span style="color:var(--green);font-size:12px;">✓</span>' : ''}
     </div>`;
   }).join('');
@@ -1692,12 +1700,26 @@ function renderAdmin() {
 function updateResultPenalties(matchId, checked) {
   if (!state.results[matchId]) state.results[matchId] = {};
   state.results[matchId].wentToPenalties = checked;
+  if (!checked) delete state.results[matchId].penWinner;
   saveState();
   showToast(checked ? `P${matchId} marcado: fue a penales 🎯` : `P${matchId}: penales desmarcado`);
+  updateKnockoutNames();
   renderStandings();
   renderGrupos();
   renderMatches();
+  renderAdmin();
   if (document.getElementById('tab-predicciones')?.classList.contains('active')) renderPredictions();
+}
+
+function updatePenWinner(matchId, winner) {
+  if (!state.results[matchId]) state.results[matchId] = {};
+  state.results[matchId].penWinner = winner;
+  saveState();
+  showToast(`✓ Ganador penales: ${winner}`);
+  updateKnockoutNames();
+  renderStandings();
+  renderGrupos();
+  renderMatches();
 }
 
 function updateResult(matchId, side, val) {
@@ -1901,11 +1923,19 @@ async function syncResults() {
 
       if (ourMatch) {
         const existing = state.results[ourMatch.id];
-        // No sobreescribir si ya existe un resultado guardado (p.ej. con wentToPenalties marcado manualmente)
         if (existing) return;
-        state.results[ourMatch.id] = { home: finalHomeScore, away: finalAwayScore, wentToPenalties };
+        // Detect penalty winner from API
+        let penWinner = undefined;
+        if (wentToPenalties) {
+          const homePen = apiMatch.home_pen ?? apiMatch.home_score_pen;
+          const awayPen = apiMatch.away_pen ?? apiMatch.away_score_pen;
+          if (homePen != null && awayPen != null) {
+            penWinner = parseInt(homePen) > parseInt(awayPen) ? ourMatch.home : ourMatch.away;
+          }
+        }
+        state.results[ourMatch.id] = { home: finalHomeScore, away: finalAwayScore, wentToPenalties, ...(penWinner ? {penWinner} : {}) };
         updated++;
-        log.push(`✓ P${ourMatch.id} ${ourMatch.home} ${finalHomeScore}-${finalAwayScore} ${ourMatch.away}${wentToPenalties ? ' (penales 🎯)' : ''}`);
+        log.push(`✓ P${ourMatch.id} ${ourMatch.home} ${finalHomeScore}-${finalAwayScore} ${ourMatch.away}${wentToPenalties ? ` (penales 🎯${penWinner?' → '+penWinner:''})` : ''}`);
       }
     });
 
