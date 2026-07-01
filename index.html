@@ -697,14 +697,16 @@ function getPlayerStats(player) {
   const podiumPts = getPodiumPoints(player);
   pts += podiumPts;
 
-  // Una predicción cuenta como "ingresada" si tiene marcador, marcó "va a penales", O está bloqueada (guardada por el jugador, aunque sin marcador por falta de tiempo)
+  // Una predicción cuenta como "ingresada" si:
+  // 1. Tiene marcador numérico, O
+  // 2. Marcó "va a penales", O  
+  // 3. Está bloqueada (guardada sin marcador por falta de tiempo)
   const playerLocked = state.locked[player] || {};
-  const allRelevantIds = new Set([...Object.keys(preds), ...Object.keys(playerLocked)]);
-  const predCount = [...allRelevantIds].filter(mid => {
+  const predCount = Object.keys(preds).filter(mid => {
     const p = preds[mid];
-    const isLocked = !!playerLocked[mid];
-    if (isLocked) return true; // guardado/bloqueado siempre cuenta, tenga o no marcador
     if (!p) return false;
+    const isLocked = !!playerLocked[mid];
+    if (isLocked) return true;
     const hasScore = p.home !== '' && p.home != null;
     return hasScore || p.predictsPenalties;
   }).length;
