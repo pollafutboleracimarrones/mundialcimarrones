@@ -1053,9 +1053,58 @@ function renderKnockoutBracket(groupStandings) {
   `;
 }
 
-// ========================
-// STANDINGS
-// ========================
+function showExactos(player) {
+  const preds = state.predictions[player] || {};
+  const exactos = [];
+
+  MATCHES_DATA.forEach(m => {
+    const result = state.results[m.id];
+    if (!result) return;
+    const pred = preds[m.id];
+    const pts = calcPoints(pred, result);
+    if (pts !== 2) return;
+
+    let label = '';
+    if (pred.predictsPenalties && result.wentToPenalties) {
+      label = '🎯 Penales';
+    } else {
+      label = `${pred.home}-${pred.away}`;
+    }
+
+    exactos.push({ m, result, pred, label });
+  });
+
+  const stats = getPlayerStats(player);
+  document.getElementById('exactos-title').textContent = `✓✓ Aciertos exactos de ${player}`;
+  document.getElementById('exactos-sub').textContent = `${exactos.length} aciertos exactos · ${stats.pts} pts totales`;
+
+  document.getElementById('exactos-list').innerHTML = exactos.length
+    ? exactos.map(({ m, result, label }) => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 8px;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:11px;color:var(--muted);">P${m.id} · ${m.date} · ${m.time}</div>
+            <div style="font-size:14px;font-weight:600;margin-top:2px;">
+              ${FLAGS[m.home]||'🏳️'} ${m.home} vs ${m.away} ${FLAGS[m.away]||'🏳️'}
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:13px;color:var(--green);font-weight:800;">${label}</div>
+            <div style="font-size:11px;color:var(--muted);">Real: ${result.home}-${result.away}${result.wentToPenalties?' 🎯':''}</div>
+          </div>
+        </div>`)
+      .join('')
+    : '<div style="color:var(--muted);font-size:13px;padding:16px;text-align:center;">Aún no hay aciertos exactos</div>';
+
+  document.getElementById('exactos-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeExactos() {
+  document.getElementById('exactos-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+
 function renderStandings() {
   const tbody = document.getElementById('standings-rows');
   const finishedCount = Object.keys(state.results).length;
@@ -1069,7 +1118,9 @@ function renderStandings() {
       <td class="rank ${rankClass}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td>
       <td class="player-name">${p.name}${INITIALS[p.name] && p.name !== 'Nono' ? ` <span style="color:var(--muted);font-size:11px;font-weight:500;">(${INITIALS[p.name]})</span>` : ''}</td>
       <td class="pts-cell">${p.pts}</td>
-      <td><span style="color:var(--green);font-weight:700">${p.exact}</span> <span class="pts-detail">✓✓</span></td>
+      <td style="cursor:pointer;" onclick="showExactos('${p.name}')" title="Ver aciertos exactos">
+        <span style="color:var(--green);font-weight:700">${p.exact}</span> <span class="pts-detail">✓✓</span>
+      </td>
       <td><span style="color:var(--blue);font-weight:700">${p.winner}</span> <span class="pts-detail">✓</span></td>
       <td>
         <div class="pts-detail">${p.predCount} ingresadas · ${p.total} evaluadas</div>
@@ -2041,5 +2092,19 @@ renderPlayerList();
 loadApiKey();
 
 </script>
+<!-- EXACTOS MODAL -->
+<div id="exactos-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.7);padding:20px;overflow-y:auto;" onclick="if(event.target===this)closeExactos()">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;max-width:500px;margin:0 auto;overflow:hidden;">
+    <div style="background:var(--surface2);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div id="exactos-title" style="font-size:16px;font-weight:800;color:var(--accent);"></div>
+        <div id="exactos-sub" style="font-size:12px;color:var(--muted);margin-top:2px;"></div>
+      </div>
+      <button onclick="closeExactos()" style="background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:14px;">✕</button>
+    </div>
+    <div id="exactos-list" style="padding:12px;"></div>
+  </div>
+</div>
+
 </body>
 </html>
