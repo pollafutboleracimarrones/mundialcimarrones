@@ -550,7 +550,7 @@ const MATCHES_DATA = [
   {id:78, date:'Jun 30', time:'4:00pm', home:'Francia', away:'Suecia', group:'16avos', phase:'knockout'},
   {id:79, date:'Jun 30', time:'8:00pm', home:'México', away:'Ecuador', group:'16avos', phase:'knockout'},
   {id:80, date:'Jul 1', time:'11:00am', home:'Inglaterra', away:'RD de Congo', group:'16avos', phase:'knockout'},
-  {id:81, date:'Jul 1', time:'1:00pm', home:'Australia', away:'Egipto', group:'16avos', phase:'knockout'},
+  {id:81, date:'Jul 3', time:'11:00am', home:'Australia', away:'Egipto', group:'16avos', phase:'knockout'},
   {id:82, date:'Jul 1', time:'3:00pm', home:'Bélgica', away:'Senegal', group:'16avos', phase:'knockout'},
   {id:83, date:'Jul 1', time:'7:00pm', home:'Estados Unidos', away:'Bosnia y Herzegovina', group:'16avos', phase:'knockout'},
   {id:84, date:'Jul 2', time:'2:00pm', home:'Portugal', away:'Croacia', group:'16avos', phase:'knockout'},
@@ -842,45 +842,68 @@ function renderGrupos() {
     groupStandings[grp].sort((a,b) => b.pts-a.pts || b.dg-a.dg || b.gf-a.gf);
   });
 
-  container.innerHTML = Object.entries(groupStandings).map(([grp, teams]) => {
-    const rows = teams.map((t,i) => {
-      const classified = i < 2;
-      const thirdPlace = i === 2;
-      const rowBg = classified ? 'background:rgba(34,197,94,0.08);' : thirdPlace ? 'background:rgba(232,185,35,0.06);' : '';
-      return `<tr style="${rowBg}">
-        <td style="padding:8px 6px;font-size:12px;color:var(--muted);">${i+1}</td>
-        <td style="padding:8px 4px;font-size:13px;font-weight:${classified?700:400};">
-          ${FLAGS[t.team]||'🏳️'} ${t.team}${classified?' <span style="color:var(--green);font-size:10px;">✓</span>':thirdPlace?' <span style="color:var(--accent);font-size:9px;">3°</span>':''}
-        </td>
-        <td style="padding:8px 4px;text-align:center;font-size:12px;color:var(--muted);">${t.pj}</td>
-        <td style="padding:8px 4px;text-align:center;font-size:12px;color:var(--green);">${t.pg}</td>
-        <td style="padding:8px 4px;text-align:center;font-size:12px;color:var(--muted);">${t.pe}</td>
-        <td style="padding:8px 4px;text-align:center;font-size:12px;color:#ef4444;">${t.pp}</td>
-        <td style="padding:8px 4px;text-align:center;font-size:11px;color:var(--muted);">${t.gf}:${t.gc}</td>
-        <td style="padding:8px 4px;text-align:center;font-size:12px;color:${t.dg>0?'var(--green)':t.dg<0?'#ef4444':'var(--muted)'};">${t.dg>0?'+':''}${t.dg}</td>
-        <td style="padding:8px 6px;text-align:center;font-size:15px;font-weight:800;color:var(--accent);">${t.pts}</td>
-      </tr>`;
-    }).join('');
-
-    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;">
-      <div style="background:var(--surface2);padding:8px 14px;font-size:12px;font-weight:700;color:var(--accent);letter-spacing:1px;border-bottom:1px solid var(--border);">GRUPO ${grp}</div>
-      <table style="width:100%;border-collapse:collapse;">
-        <thead><tr style="border-bottom:1px solid var(--border);">
-          <th style="padding:5px 6px;font-size:9px;color:var(--muted);text-align:left;">#</th>
-          <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:left;">EQUIPO</th>
-          <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;" title="Partidos Jugados">PJ</th>
-          <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;" title="Ganados">G</th>
-          <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;" title="Empatados">E</th>
-          <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;" title="Perdidos">P</th>
-          <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;">GF:GC</th>
-          <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;">DG</th>
-          <th style="padding:5px 6px;font-size:9px;color:var(--muted);text-align:center;">PTS</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-      <div style="padding:5px 10px;font-size:10px;color:var(--muted);border-top:1px solid var(--border);">✓ <span style="color:var(--green);">Top 2</span> clasifican directo · <span style="color:var(--accent);">3° mejor</span> puede clasificar</div>
+  // Groups section - collapsible, collapsed by default since phase is over
+  const gruposHtml = `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;">
+      <div onclick="toggleGruposSection()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface2);">
+        <span style="font-size:14px;font-weight:700;color:var(--accent);">⚽ Tabla de Grupos (Fase concluida)</span>
+        <span id="grupos-toggle-icon" style="font-size:18px;color:var(--muted);">›</span>
+      </div>
+      <div id="grupos-tables" style="display:none;">
+        ${Object.entries(groupStandings).map(([grp, teams]) => {
+          const rows = teams.map((t,i) => {
+            const classified = i < 2;
+            const thirdPlace = i === 2;
+            const rowBg = classified ? 'background:rgba(34,197,94,0.08);' : thirdPlace ? 'background:rgba(232,185,35,0.06);' : '';
+            return `<tr style="${rowBg}">
+              <td style="padding:8px 6px;font-size:12px;color:var(--muted);">${i+1}</td>
+              <td style="padding:8px 4px;font-size:13px;font-weight:${classified?700:400};">
+                ${FLAGS[t.team]||'🏳️'} ${t.team}${classified?' <span style="color:var(--green);font-size:10px;">✓</span>':thirdPlace?' <span style="color:var(--accent);font-size:9px;">3°</span>':''}
+              </td>
+              <td style="padding:8px 4px;text-align:center;font-size:12px;color:var(--muted);">${t.pj}</td>
+              <td style="padding:8px 4px;text-align:center;font-size:12px;color:var(--green);">${t.pg}</td>
+              <td style="padding:8px 4px;text-align:center;font-size:12px;color:var(--muted);">${t.pe}</td>
+              <td style="padding:8px 4px;text-align:center;font-size:12px;color:#ef4444;">${t.pp}</td>
+              <td style="padding:8px 4px;text-align:center;font-size:11px;color:var(--muted);">${t.gf}:${t.gc}</td>
+              <td style="padding:8px 4px;text-align:center;font-size:12px;color:${t.dg>0?'var(--green)':t.dg<0?'#ef4444':'var(--muted)'};">${t.dg>0?'+':''}${t.dg}</td>
+              <td style="padding:8px 6px;text-align:center;font-size:15px;font-weight:800;color:var(--accent);">${t.pts}</td>
+            </tr>`;
+          }).join('');
+          return `<div style="margin:10px 10px 0;">
+            <div style="font-size:11px;font-weight:700;color:var(--accent);padding:6px 0;letter-spacing:1px;">GRUPO ${grp}</div>
+            <table style="width:100%;border-collapse:collapse;background:var(--surface);border-radius:8px;overflow:hidden;margin-bottom:10px;border:1px solid var(--border);">
+              <thead><tr style="border-bottom:1px solid var(--border);">
+                <th style="padding:5px 6px;font-size:9px;color:var(--muted);text-align:left;">#</th>
+                <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:left;">EQUIPO</th>
+                <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;">PJ</th>
+                <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;">G</th>
+                <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;">E</th>
+                <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;">P</th>
+                <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;">GF:GC</th>
+                <th style="padding:5px 4px;font-size:9px;color:var(--muted);text-align:center;">DG</th>
+                <th style="padding:5px 6px;font-size:9px;color:var(--muted);text-align:center;">PTS</th>
+              </tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>`;
+        }).join('')}
+        <div style="padding:8px 14px;font-size:10px;color:var(--muted);">✓ <span style="color:var(--green);">Top 2</span> clasificaron directo · <span style="color:var(--accent);">3° mejor</span> también clasificaron</div>
+      </div>
     </div>`;
-  }).join('') + renderKnockoutBracket(groupStandings);
+
+  container.innerHTML = gruposHtml + renderKnockoutBracket(groupStandings);
+}
+
+function toggleGruposSection() {
+  const el = document.getElementById('grupos-tables');
+  const icon = document.getElementById('grupos-toggle-icon');
+  if (el.style.display === 'none') {
+    el.style.display = 'block';
+    icon.textContent = '⌄';
+  } else {
+    el.style.display = 'none';
+    icon.textContent = '›';
+  }
 }
 
 function getWinner(matchId) {
@@ -909,17 +932,6 @@ function updateKnockoutNames() {
       }
     });
   });
-}
-
-function renderGrupos() {
-  const r = state.results[matchId];
-  if (!r) return null;
-  const m = MATCHES_DATA.find(mm => mm.id === matchId);
-  if (!m) return null;
-  const hg = parseInt(r.home), ag = parseInt(r.away);
-  if (hg > ag) return m.home;
-  if (ag > hg) return m.away;
-  return null; // tie - needs penalties, not auto-resolved
 }
 
 function renderKnockoutBracket(groupStandings) {
