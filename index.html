@@ -245,7 +245,7 @@
     <div style="margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
       <div>
         <div style="font-size:22px; font-weight:800; color:var(--text);">Tabla de Posiciones</div>
-        <div style="font-size:13px; color:var(--muted); margin-top:2px;">Resultado Exacto = <strong style="color:var(--accent)">2pts</strong> · Ganador Correcto = <strong style="color:var(--blue)">1pt</strong> · 🏆 Podio Final = <strong style="color:var(--accent)">+3pts</strong> c/u <span style="color:var(--muted);">(se evalúa al definirse semifinales)</span></div>
+        <div style="font-size:13px; color:var(--muted); margin-top:2px;">Resultado Exacto = <strong style="color:var(--accent)">2pts</strong> · Ganador Correcto = <strong style="color:var(--blue)">1pt</strong> · 🏆 Podio Final = <strong style="color:var(--accent)">+3pts</strong> posición exacta · <strong style="color:var(--blue)">+1pt</strong> en podio</div>
         <div style="font-size:11px; color:var(--muted); margin-top:2px;">🎯 Desde 16avos: el marcador cubre hasta los 120 min. Si aciertas que un partido se va a <strong style="color:var(--text2);">penales</strong>, ganas 2 pts automáticos.</div>
       </div>
       <div id="total-matches-played" style="font-size:13px; color:var(--muted);"></div>
@@ -338,7 +338,7 @@
     </div>
     <div class="admin-section">
       <div class="admin-title">🏆 Podio Final Real</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:10px;">⏳ Los puntos NO se suman hasta llenar los 4 puestos. Espera a que el Mundial defina realmente al Campeón, Subcampeón, 3° y 4° puesto (tras la Final y el partido por el Tercer Puesto) y entonces complétalos aquí — ahí se evalúan y suman automáticamente +3 pts por cada acierto.</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px;">⏳ Los puntos se suman cuando estén los 4 puestos completos. <strong style="color:var(--accent);">+3 pts</strong> por posición exacta · <strong style="color:var(--blue);">+1 pt</strong> si el equipo entró al podio pero en diferente posición.</div>
       <div id="real-podium-form"></div>
     </div>
     <div class="admin-section">
@@ -665,14 +665,24 @@ function calcPoints(pred, result) {
 function getPodiumPoints(player) {
   const pick = state.podium[player];
   const real = state.realPodium || {};
-  // Solo se evalúa cuando los 4 puestos reales ya están definidos (Mundial llegó a semifinales/final)
+  // Solo se evalúa cuando los 4 puestos reales ya están definidos
   const realComplete = real.campeon && real.subcampeon && real.tercero && real.cuarto;
   if (!pick || !realComplete) return 0;
+
+  const realTeams = [real.campeon, real.subcampeon, real.tercero, real.cuarto];
   let pts = 0;
-  if (pick.campeon && pick.campeon === real.campeon) pts += 3;
-  if (pick.subcampeon && pick.subcampeon === real.subcampeon) pts += 3;
-  if (pick.tercero && pick.tercero === real.tercero) pts += 3;
-  if (pick.cuarto && pick.cuarto === real.cuarto) pts += 3;
+
+  const positions = ['campeon', 'subcampeon', 'tercero', 'cuarto'];
+  positions.forEach(pos => {
+    const picked = pick[pos];
+    if (!picked) return;
+    if (picked === real[pos]) {
+      pts += 3; // posición exacta
+    } else if (realTeams.includes(picked)) {
+      pts += 1; // entró al podio pero en otra posición
+    }
+  });
+
   return pts;
 }
 
@@ -1505,9 +1515,14 @@ function renderPodiumSection(player) {
         ${isLocked ? '<span style="font-size:11px;color:var(--green);font-weight:700;">🔒 Guardado</span>' : '<span style="font-size:10px;color:var(--muted);">3 pts por cada acierto exacto</span>'}
       </div>
       ${fields.map(f => {
-        const correct = realComplete && pick[f.key] && real[f.key] === pick[f.key];
+        const realTeams4 = realComplete ? [real.campeon, real.subcampeon, real.tercero, real.cuarto] : [];
+        const isExact = realComplete && pick[f.key] && real[f.key] === pick[f.key];
+        const isInPodio = realComplete && pick[f.key] && !isExact && realTeams4.includes(pick[f.key]);
+        const scoreLabel = isExact ? '<span style="color:var(--green);font-weight:700;">✓ +3</span>' 
+                         : isInPodio ? '<span style="color:var(--blue);font-weight:700;">~ +1</span>' 
+                         : '';
         return `<div style="margin-bottom:8px;">
-          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">${f.label} <span style="color:var(--accent);">(${f.pts})</span> ${correct ? '<span style="color:var(--green);font-weight:700;">✓ +3</span>' : ''}</label>
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">${f.label} <span style="color:var(--accent);">(${f.pts})</span> ${scoreLabel}</label>
           <select id="podium-${f.key}" ${isLocked?'disabled':''} onchange="savePodiumPick('${player}','${f.key}',this.value)"
             style="width:100%;background:${isLocked?'#fff':'var(--surface2)'};color:${isLocked?'#111':'var(--text)'};border:1px solid var(--border);padding:10px;border-radius:6px;font-size:14px;${isLocked?'font-weight:700;':''}">
             ${teamOptions(pick[f.key])}
