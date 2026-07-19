@@ -233,6 +233,7 @@
       <button class="tab-btn" onclick="showTab('partidos')">⚽<span>Partidos</span></button>
       <button class="tab-btn" onclick="showTab('grupos')">🏟️<span>Grupos</span></button>
       <button class="tab-btn" onclick="showTab('predicciones')">🎯<span>Pred.</span></button>
+      <button class="tab-btn" onclick="showTab('podio')">🏆<span>Podio</span></button>
       <button class="tab-btn" onclick="showTab('admin')">⚙️<span>Admin</span></button>
     </div>
   </div>
@@ -250,6 +251,9 @@
       </div>
       <div id="total-matches-played" style="font-size:13px; color:var(--muted);"></div>
     </div>
+    <!-- PODIO DE GANADORES -->
+    <div id="winners-podium" style="display:none;margin-bottom:24px;"></div>
+
     <table class="standings-table" id="standings-body">
       <thead>
         <tr>
@@ -279,6 +283,11 @@
       <input class="search-bar" id="match-search" placeholder="🔍 Buscar selección..." oninput="renderMatches()" />
     </div>
     <div id="matches-list"></div>
+  </div>
+
+  <!-- PODIO -->
+  <div id="tab-podio" class="section">
+    <div id="podio-content"></div>
   </div>
 
   <!-- GRUPOS -->
@@ -735,6 +744,7 @@ function showTab(tab) {
   if (tab === 'tabla') renderStandings();
   if (tab === 'partidos') renderMatches();
   if (tab === 'grupos') renderGrupos();
+  if (tab === 'podio') renderPodioTab();
   if (tab === 'predicciones') {
     document.getElementById('pred-player-select').style.display = 'block';
     document.getElementById('pred-player-view').style.display = 'none';
@@ -1115,11 +1125,103 @@ function closeExactos() {
 }
 
 
+function renderPodioTab() {
+  const sorted = PLAYERS.map(p => ({ name: p, ...getPlayerStats(p) }))
+    .sort((a,b) => b.pts - a.pts || b.exact - a.exact);
+  const top3 = sorted.slice(0, 3);
+  const rest = sorted.slice(3);
+
+  const medals = ['🥇','🥈','🥉'];
+  const colors = ['#e8b923','#c0c0c0','#cd7f32'];
+  const heights = ['140px','110px','85px'];
+  const podiumOrder = [1, 0, 2]; // visual: 2nd left, 1st center, 3rd right
+  const INITIALS_MAP = {
+    'Sr. Godoy': 'GDY', 'Mauricio Diaz': 'MD', 'Don Timba': 'DT',
+    'Nono': 'NONO', 'Andres Reina': 'AR', 'John Triviño': 'JT',
+    'Carlos Toro': 'CT', 'DJ Asesor': 'DJA'
+  };
+
+  // Trophy image if available
+  const trophyImg = typeof TROPHY_IMG !== 'undefined'
+    ? `<img src="${TROPHY_IMG}" style="height:80px;width:auto;margin:0 auto 8px;display:block;" alt="Copa"/>`
+    : '<div style="font-size:60px;text-align:center;margin-bottom:8px;">🏆</div>';
+
+  document.getElementById('podio-content').innerHTML = `
+    <div style="text-align:center;padding:16px 0 24px;">
+      ${trophyImg}
+      <div style="font-size:20px;font-weight:900;color:var(--accent);letter-spacing:1px;">CAMPEONES CIMARRONES</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;">Polla Mundialista · Mundial 2026</div>
+    </div>
+
+    <!-- PODIO VISUAL -->
+    <div style="display:flex;align-items:flex-end;justify-content:center;gap:8px;padding:0 8px 0;">
+      ${podiumOrder.map(i => {
+        const p = top3[i];
+        if (!p) return '<div style="flex:1;"></div>';
+        const ini = INITIALS_MAP[p.name] || p.name.split(' ')[0];
+        return `
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <div style="font-size:${i===0?'32':'24'}px;">${medals[i]}</div>
+            <div style="font-size:${i===0?'15':'13'}px;font-weight:800;color:var(--text);text-align:center;line-height:1.2;">${p.name.split(' ')[0]}<br/><span style="font-size:10px;color:var(--muted);">(${ini})</span></div>
+            <div style="font-size:${i===0?'26':'20'}px;font-weight:900;color:${colors[i]};">${p.pts}</div>
+            <div style="font-size:9px;color:var(--muted);">pts</div>
+            <div style="
+              width:100%;
+              height:${heights[i]};
+              background:${colors[i]}22;
+              border:2px solid ${colors[i]};
+              border-radius:10px 10px 0 0;
+              display:flex;
+              flex-direction:column;
+              align-items:center;
+              justify-content:center;
+              gap:4px;
+            ">
+              <div style="font-size:${i===0?'36':'28'}px;">${medals[i]}</div>
+              <div style="font-size:10px;color:${colors[i]};font-weight:700;">${i===0?'CAMPEÓN':i===1?'2° LUGAR':'3° LUGAR'}</div>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>
+
+    <!-- STATS CARDS -->
+    <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px;padding:0 4px;">
+      ${top3.map((p, i) => `
+        <div style="background:var(--surface);border:1px solid ${colors[i]};border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;">
+          <div style="font-size:28px;">${medals[i]}</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:800;color:var(--text);">${p.name}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">
+              ${p.exact} exactos ✓✓ · ${p.winner} ganador ✓ · ${p.predCount} predicciones
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:28px;font-weight:900;color:${colors[i]};">${p.pts}</div>
+            <div style="font-size:10px;color:var(--muted);">puntos</div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <!-- REST OF TABLE -->
+    <div style="margin-top:20px;padding:0 4px;">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:600;letter-spacing:1px;">CLASIFICACIÓN FINAL</div>
+      ${rest.map((p, i) => `
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <div style="font-size:16px;font-weight:800;color:var(--muted);width:24px;text-align:center;">${i+4}</div>
+          <div style="flex:1;font-size:14px;font-weight:600;color:var(--text2);">${p.name}</div>
+          <div style="font-size:16px;font-weight:700;color:var(--accent);">${p.pts} pts</div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+
 function renderStandings() {
   const tbody = document.getElementById('standings-rows');
   const finishedCount = Object.keys(state.results).length;
   document.getElementById('total-matches-played').textContent = `${finishedCount} / 104 partidos jugados`;
   const sorted = PLAYERS.map(p => ({ name: p, ...getPlayerStats(p) })).sort((a,b) => b.pts - a.pts || b.exact - a.exact);
+  renderWinnersPodium(sorted);
   const maxPts = sorted[0]?.pts || 1;
   tbody.innerHTML = sorted.map((p, i) => {
     const rankClass = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
