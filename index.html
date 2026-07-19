@@ -251,9 +251,6 @@
       </div>
       <div id="total-matches-played" style="font-size:13px; color:var(--muted);"></div>
     </div>
-    <!-- PODIO DE GANADORES -->
-    <div id="winners-podium" style="display:none;margin-bottom:24px;"></div>
-
     <table class="standings-table" id="standings-body">
       <thead>
         <tr>
@@ -1221,7 +1218,6 @@ function renderStandings() {
   const finishedCount = Object.keys(state.results).length;
   document.getElementById('total-matches-played').textContent = `${finishedCount} / 104 partidos jugados`;
   const sorted = PLAYERS.map(p => ({ name: p, ...getPlayerStats(p) })).sort((a,b) => b.pts - a.pts || b.exact - a.exact);
-  renderWinnersPodium(sorted);
   const maxPts = sorted[0]?.pts || 1;
   tbody.innerHTML = sorted.map((p, i) => {
     const rankClass = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
